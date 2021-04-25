@@ -1,0 +1,47 @@
+{
+  "name": "harold-scripts",
+  "version": "0.1.0",
+  "description": "Harold JS Scripts for Create Harold App",
+  "author": "Julian Ćwirko (julian.io)",
+  "engines": {
+    "node": ">=12.0.0"
+  },
+  "bin": {
+    "harold-scripts": "./bin/harold-scripts.js"
+  },
+  "scripts": {
+    "lint": "eslint -c .eslintrc . --fix",
+    "prettier": "prettier --write '**/*.{js,json}'"
+  },
+  "license": "MIT",
+  "dependencies": {
+    "autoprefixer": "^9.7.5",
+    "chalk": "^3.0.0",
+    "chokidar": "^3.5.1",
+    "commander": "^7.1.0",
+    "cross-spawn": "^7.0.3",
+    "dateformat": "^4.5.1",
+    "deepmerge": "^4.2.2",
+    "eslint": "^7.12.0",
+    "eslint-config-prettier": "^6.14.0",
+    "eslint-plugin-prettier": "^3.1.4",
+    "fs-extra": "^9.1.0",
+    "glob": "^7.1.6",
+    "handlebars": "^4.7.4",
+    "node-sass": "^4.14.1",
+    "postcss": "^7.0.27",
+    "prettier": "^2.1.2",
+    "rehype-format": "^3.0.0",
+    "rehype-raw": "^4.0.2",
+    "rehype-sanitize": "^3.0.1",
+    "rehype-stringify": "^6.0.1",
+    "remark": "^11.0.2",
+    "remark-frontmatter": "^1.3.2",
+    "remark-rehype": "^5.0.0",
+    "serve-handler": "^6.1.3",
+    "to-vfile": "^6.0.1",
+    "unified": "^8.4.2",
+    "vfile-matter": "^1.0.2"
+  },
+  "devDependencies": {}
+}
