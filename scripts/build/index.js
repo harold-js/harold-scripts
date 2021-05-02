@@ -9,8 +9,8 @@ prepareDirectories();
 // Copy assets
 copyAssets();
 
-// Copy JSON data
-copyJSONData();
-
 // Build files
 build();
+
+// Copy JSON data
+copyJSONData();
