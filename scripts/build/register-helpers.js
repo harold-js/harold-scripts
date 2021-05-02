@@ -91,7 +91,7 @@ module.exports = () => {
                     `<article class="${className}--article">
                       ${
                         item.coverImage && !noImage
-                          ? `<div class="${className}--image"><a href="${config.postsDirName}/${item.fileName}"><img src='${item.coverImage}' alt="${item.title}" /></a></div>`
+                          ? `<div class="${className}--image"><a href="/${config.postsDirName}/${item.fileName}"><img src='${item.coverImage}' alt="${item.title}" /></a></div>`
                           : ''
                       }
                       ${
@@ -103,7 +103,7 @@ module.exports = () => {
                           : ''
                       }
                       <div class="${className}--title">
-                        <a href="${config.postsDirName}/${item.fileName}">
+                        <a href="/${config.postsDirName}/${item.fileName}">
                           ${item.title}
                         </a>
                       </div>
@@ -122,7 +122,7 @@ module.exports = () => {
                       ${
                         !noReadMoreButton
                           ? `<div>
-                        <a href="${config.postsDirName}/${item.fileName}" class="${className}--button">${readMoreButtonLabel}</a>
+                        <a href="/${config.postsDirName}/${item.fileName}" class="${className}--button">${readMoreButtonLabel}</a>
                       </div>`
                           : ''
                       }
