@@ -1,8 +1,18 @@
+const { cosmiconfigSync } = require('cosmiconfig');
+const explorerSync = cosmiconfigSync('harold');
+const loaded = explorerSync.search(process.cwd());
+
 module.exports = {
   srcDirName: 'src',
-  layoutsDirName: 'blog-layouts',
+  layoutsDirName:
+    loaded && loaded.config && loaded.config.mdFilesLayoutsDirName
+      ? loaded.config.mdFilesLayoutsDirName
+      : 'blog-layouts',
   partialsDirName: 'partials',
-  postsDirName: 'posts',
+  postsDirName:
+    loaded && loaded.config && loaded.config.mdFilesDirName
+      ? loaded.config.mdFilesDirName
+      : 'posts',
   pagesDirName: 'pages',
   assetsDirName: 'assets',
   publicDirName: 'build',

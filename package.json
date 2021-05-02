@@ -1,6 +1,6 @@
 {
   "name": "harold-scripts",
-  "version": "0.2.1",
+  "version": "0.3.0",
   "description": "Harold JS Scripts for Create Harold App",
   "author": "Julian Ćwirko (julian.io)",
   "engines": {
@@ -28,6 +28,7 @@
     "chalk": "^3.0.0",
     "chokidar": "^3.5.1",
     "commander": "^7.1.0",
+    "cosmiconfig": "^7.0.0",
     "cross-spawn": "^7.0.3",
     "dateformat": "^4.5.1",
     "deepmerge": "^4.2.2",
