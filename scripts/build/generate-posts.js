@@ -55,7 +55,7 @@ const getLayout = (layout) => {
 const generate = (fileName) => {
   unified()
     .use(markdown)
-    .use(remark2rehype, { allowDangerousHTML: true })
+    .use(remark2rehype, { allowDangerousHtml: true })
     .use(raw)
     .use(format)
     .use(html)
