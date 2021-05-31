@@ -1,6 +1,6 @@
 {
   "name": "harold-scripts",
-  "version": "0.3.2",
+  "version": "0.3.3",
   "description": "Harold JS Scripts for Create Harold App",
   "author": "Julian Ćwirko (julian.io)",
   "engines": {
@@ -9,6 +9,7 @@
   "bin": {
     "harold-scripts": "./bin/harold-scripts.js"
   },
+  "homepage": "https://www.haroldjs.com",
   "repository": {
     "type": "git",
     "url": "https://github.com/juliancwirko/harold-scripts"
