@@ -15,9 +15,16 @@ module.exports = {
       : 'posts',
   pagesDirName: 'pages',
   assetsDirName: 'assets',
-  publicDirName: 'build',
+  publicDirName:
+    loaded && loaded.config && loaded.config.outputDirName
+      ? loaded.config.outputDirName
+      : 'build',
   stylesDirName: 'styles',
   jsonDataDirName: 'jsonData',
+  hostDirName:
+    loaded && loaded.config && loaded.config.hostDirName
+      ? loaded.config.hostDirName
+      : '',
   frontMatterAvailableKeys: [
     {
       name: 'layout',

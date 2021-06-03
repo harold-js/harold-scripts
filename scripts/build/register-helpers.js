@@ -6,9 +6,20 @@ const chalk = require('chalk');
 
 const config = require('./constants');
 
+const getRelativePath = (filePath, options) =>
+  path.relative(`${options.data.root.publicRelativeFileDir}`, filePath);
+
 // Handlebars core helpers
 module.exports = () => {
   Handlebars.registerHelper({
+    relativePath: function (assetPath, options) {
+      return getRelativePath(`${config.publicDirName}/${assetPath}`, options);
+    },
+
+    hostDirName: function () {
+      return config.hostDirName;
+    },
+
     formatDate: function (options) {
       const { date, format = 'yyyy-mm-dd' } = options.hash;
       if (date && typeof date === 'string') {
@@ -91,7 +102,12 @@ module.exports = () => {
                     `<article class="${className}--article">
                       ${
                         item.coverImage && !noImage
-                          ? `<div class="${className}--image"><a href="/${config.postsDirName}/${item.fileName}"><img src='${item.coverImage}' alt="${item.title}" /></a></div>`
+                          ? `<div class="${className}--image"><a href="${getRelativePath(
+                              `${config.publicDirName}/${config.postsDirName}/${item.fileName}`,
+                              options
+                            )}"><img src='${item.coverImage}' alt="${
+                              item.title
+                            }" /></a></div>`
                           : ''
                       }
                       ${
@@ -103,7 +119,10 @@ module.exports = () => {
                           : ''
                       }
                       <div class="${className}--title">
-                        <a href="/${config.postsDirName}/${item.fileName}">
+                        <a href="${getRelativePath(
+                          `${config.publicDirName}/${config.postsDirName}/${item.fileName}`,
+                          options
+                        )}">
                           ${item.title}
                         </a>
                       </div>
@@ -122,7 +141,10 @@ module.exports = () => {
                       ${
                         !noReadMoreButton
                           ? `<div>
-                        <a href="/${config.postsDirName}/${item.fileName}" class="${className}--button">${readMoreButtonLabel}</a>
+                        <a href="${getRelativePath(
+                          `${config.publicDirName}/${config.postsDirName}/${item.fileName}`,
+                          options
+                        )}" class="${className}--button">${readMoreButtonLabel}</a>
                       </div>`
                           : ''
                       }
