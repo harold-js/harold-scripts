@@ -16,7 +16,9 @@ const generate = (fileName) => {
 
   const template = Handlebars.compile(String(file));
 
-  file.contents = template();
+  file.contents = template({
+    publicRelativeFileDir: `${config.publicDirName}`,
+  });
 
   const filePath = `${path.join(process.cwd(), config.publicDirName)}/${
     path.parse(fileName).name

@@ -90,18 +90,17 @@ const generate = (fileName) => {
         // Prepare file with Handlebars template
         file.contents = layoutTemplate({
           ...frontMatterSettings,
-          ...{ title: frontMatterSettings.title || fileName.split('.')[0] },
-          ...{
-            publicationDate:
-              frontMatterSettings.publicationDate ||
-              fs.statSync(
-                `${path.join(
-                  process.cwd(),
-                  `${config.srcDirName}/${config.postsDirName}`
-                )}/${fileName}`
-              ).ctimeMs,
-          },
-          ...{ content: file.contents },
+          title: frontMatterSettings.title || fileName.split('.')[0],
+          publicationDate:
+            frontMatterSettings.publicationDate ||
+            fs.statSync(
+              `${path.join(
+                process.cwd(),
+                `${config.srcDirName}/${config.postsDirName}`
+              )}/${fileName}`
+            ).ctimeMs,
+          content: file.contents,
+          publicRelativeFileDir: `${config.publicDirName}/${config.postsDirName}`,
         });
 
         file.path = `${path.join(process.cwd(), config.publicDirName)}/${
