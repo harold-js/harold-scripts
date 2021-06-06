@@ -112,7 +112,7 @@ module.exports = () => {
                       }
                       ${
                         !noDate
-                          ? `<div class="${className}--data">${dateformat(
+                          ? `<div class="${className}--date">${dateformat(
                               new Date(item.publicationDate),
                               dateFormat
                             )}</div>`
