@@ -1,6 +1,6 @@
 const { cosmiconfigSync } = require('cosmiconfig');
 const explorerSync = cosmiconfigSync('harold');
-const loaded = explorerSync.search(process.cwd());
+const loaded = explorerSync.search(`${process.cwd()}/src`);
 
 module.exports = {
   srcDirName: 'src',
