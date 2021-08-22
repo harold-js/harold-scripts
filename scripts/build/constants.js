@@ -21,6 +21,7 @@ module.exports = {
       : 'build',
   stylesDirName: 'styles',
   jsonDataDirName: 'jsonData',
+  staticsDirName: 'statics',
   hostDirName:
     loaded && loaded.config && loaded.config.hostDirName
       ? loaded.config.hostDirName

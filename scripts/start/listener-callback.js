@@ -4,6 +4,7 @@ const build = require('../build/build');
 const copyAssets = require('../build/copy-assets');
 const copyJSONData = require('../build/copy-json-data');
 const config = require('../build/constants');
+const copyStatics = require('../build/copy-statics');
 
 // Operations for file changes listener
 module.exports = (event, path) => {
@@ -13,6 +14,16 @@ module.exports = (event, path) => {
   }
   if (path.includes(`${config.srcDirName}/${config.postsDirName}`)) {
     copyJSONData();
+  }
+  if (path.includes(`${config.srcDirName}/${config.staticsDirName}`)) {
+    copyStatics();
+    if (event === 'unlink') {
+      const publicPath = path.replace(
+        `${config.srcDirName}/${config.staticsDirName}`,
+        config.publicDirName
+      );
+      fse.removeSync(publicPath);
+    }
   }
   if (
     path.includes(`${config.srcDirName}/${config.pagesDirName}`) &&
