@@ -20,7 +20,7 @@ const config = require('./constants');
 const schema = deepMerge(sanitizeSchema, {
   attributes: {
     '*': ['className'],
-    iframe: ['src', 'width', 'height', 'allowfullscreen'],
+    iframe: ['src', 'width', 'height', 'allowFullScreen', 'allow'],
   },
   tagNames: ['iframe'],
 });
