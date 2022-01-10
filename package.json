@@ -1,6 +1,6 @@
 {
   "name": "harold-scripts",
-  "version": "0.8.0",
+  "version": "0.8.1",
   "description": "Harold JS Scripts for Create Harold App",
   "author": "Julian Ćwirko (julian.io)",
   "engines": {
@@ -53,6 +53,5 @@
     "to-vfile": "^6.0.1",
     "unified": "^8.4.2",
     "vfile-matter": "^1.0.2"
-  },
-  "devDependencies": {}
+  }
 }
