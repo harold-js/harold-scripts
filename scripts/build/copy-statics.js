@@ -1,7 +1,7 @@
-const fse = require('fs-extra');
-const config = require('./constants');
+import fse from 'fs-extra';
+import config from './constants.js';
 
-module.exports = () => {
+const copyStatic = () => {
   if (fse.pathExistsSync(`${config.srcDirName}/${config.staticsDirName}`)) {
     fse.copySync(
       `${config.srcDirName}/${config.staticsDirName}`,
@@ -9,3 +9,5 @@ module.exports = () => {
     );
   }
 };
+
+export default copyStatic;

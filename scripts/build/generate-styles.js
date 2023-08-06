@@ -1,14 +1,14 @@
-const path = require('path');
-const fs = require('fs');
-const fse = require('fs-extra');
-const sass = require('sass');
-const config = require('./constants');
-const glob = require('glob');
-const autoprefixer = require('autoprefixer');
-const postcss = require('postcss');
-const chalk = require('chalk');
+import path from 'node:path';
+import fs from 'node:fs';
+import fse from 'fs-extra';
+import { renderSync } from 'sass';
+import { glob } from 'glob';
+import autoprefixer from 'autoprefixer';
+import postcss from 'postcss';
+import chalk from 'chalk';
+import config from './constants.js';
 
-module.exports = () => {
+const generateStyles = () => {
   const files = glob.sync(
     path.join(
       process.cwd(),
@@ -23,7 +23,7 @@ module.exports = () => {
         ['.scss', '.css'].includes(path.extname(fileName)) &&
         path.parse(fileName).name.charAt(0) !== '_'
       ) {
-        const scssProcessResult = sass.renderSync({
+        const scssProcessResult = renderSync({
           file: fileName,
           sourceMap: true,
         });
@@ -58,3 +58,5 @@ module.exports = () => {
     });
   }
 };
+
+export default generateStyles;

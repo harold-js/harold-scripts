@@ -1,16 +1,17 @@
-const fs = require('fs');
-const path = require('path');
-const Handlebars = require('handlebars');
-const dateformat = require('dateformat');
-const chalk = require('chalk');
+import fs from 'node:fs';
+import path from 'node:path';
+import Handlebars from 'handlebars';
+import dateFormat from 'dateformat';
+import chalk from 'chalk';
+import config from './constants.js';
 
-const config = require('./constants');
+const dformat = dateFormat;
 
 const getRelativePath = (filePath, options) =>
   path.relative(`${options.data.root.publicRelativeFileDir}`, filePath);
 
 // Handlebars core helpers
-module.exports = () => {
+const registerHelpers = () => {
   Handlebars.registerHelper({
     relativePath: function (assetPath, options) {
       return getRelativePath(`${config.publicDirName}/${assetPath}`, options);
@@ -23,7 +24,7 @@ module.exports = () => {
     formatDate: function (options) {
       const { date, format = 'yyyy-mm-dd' } = options.hash;
       if (date && typeof date === 'string') {
-        return dateformat(new Date(date), format);
+        return dformat(new Date(date), format);
       }
       console.log(
         chalk.red.bold(
@@ -112,7 +113,7 @@ module.exports = () => {
                       }
                       ${
                         !noDate
-                          ? `<div class="${className}--date">${dateformat(
+                          ? `<div class="${className}--date">${dformat(
                               new Date(item.publicationDate),
                               dateFormat
                             )}</div>`
@@ -160,3 +161,5 @@ module.exports = () => {
     },
   });
 };
+
+export default registerHelpers;

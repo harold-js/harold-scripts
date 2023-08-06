@@ -1,6 +1,9 @@
 #!/usr/bin/env node
 
-const spawn = require('cross-spawn');
+import spawn from 'cross-spawn';
+import { createRequire } from 'node:module';
+
+const require = createRequire(import.meta.url);
 
 const args = process.argv;
 

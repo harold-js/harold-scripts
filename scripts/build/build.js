@@ -1,10 +1,10 @@
-const generatePosts = require('./generate-posts');
-const generatePages = require('./generate-pages');
-const generatePartials = require('./generate-partials');
-const registerHelpers = require('./register-helpers');
-const generateStyles = require('./generate-styles');
+import generatePosts from './generate-posts.js';
+import generatePages from './generate-pages.js';
+import generatePartials from './generate-partials.js';
+import registerHelpers from './register-helpers.js';
+import generateStyles from './generate-styles.js';
 
-module.exports = () => {
+export const build = () => {
   // Register core helpers
   registerHelpers();
 
@@ -20,3 +20,5 @@ module.exports = () => {
   // Generate pages from .hbs source files
   generatePages();
 };
+
+export default build;

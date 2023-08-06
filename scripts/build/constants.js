@@ -1,8 +1,9 @@
-const { cosmiconfigSync } = require('cosmiconfig');
+import { cosmiconfigSync } from 'cosmiconfig';
+
 const explorerSync = cosmiconfigSync('harold');
 const loaded = explorerSync.search(`${process.cwd()}/src`);
 
-module.exports = {
+const config = {
   srcDirName: 'src',
   layoutsDirName:
     loaded && loaded.config && loaded.config.mdFilesLayoutsDirName
@@ -53,3 +54,5 @@ module.exports = {
     },
   ],
 };
+
+export default config;

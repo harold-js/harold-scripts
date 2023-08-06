@@ -1,10 +1,12 @@
-const fse = require('fs-extra');
-const config = require('./constants');
+import fse from 'fs-extra';
+import config from './constants.js';
 
-module.exports = () => {
+const copyJSONData = () => {
   fse.removeSync(`${config.publicDirName}/${config.jsonDataDirName}`);
   fse.copySync(
     `${config.srcDirName}/${config.jsonDataDirName}`,
     `${config.publicDirName}/${config.jsonDataDirName}`
   );
 };
+
+export default copyJSONData;

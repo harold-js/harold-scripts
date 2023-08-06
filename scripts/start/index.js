@@ -1,9 +1,9 @@
-const spawn = require('cross-spawn');
-const handler = require('serve-handler');
-const http = require('http');
-const chokidar = require('chokidar');
-const config = require('../build/constants');
-const chokidarCallback = require('./listener-callback');
+import spawn from 'cross-spawn';
+import handler from 'serve-handler';
+import http from 'node:http';
+import chokidar from 'chokidar';
+import config from '../build/constants.js';
+import chokidarCallback from './listener-callback.js';
 
 // Initial build
 const result = spawn.sync('harold-scripts', ['build'], { stdio: 'inherit' });
