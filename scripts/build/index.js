@@ -1,8 +1,8 @@
-const prepareDirectories = require('./prepare-dirs');
-const copyAssets = require('./copy-assets');
-const copyJSONData = require('./copy-json-data');
-const copyStatics = require('./copy-statics');
-const build = require('./build');
+import prepareDirectories from './prepare-dirs.js';
+import copyAssets from './copy-assets.js';
+import copyJSONData from './copy-json-data.js';
+import copyStatics from './copy-statics.js';
+import build from './build.js';
 
 // Prepare directories
 prepareDirectories();

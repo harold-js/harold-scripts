@@ -1,13 +1,13 @@
-const path = require('path');
-const fs = require('fs');
-const vfile = require('to-vfile');
-const Handlebars = require('handlebars');
-const config = require('./constants');
-const chalk = require('chalk');
+import path from 'node:path';
+import fs from 'node:fs';
+import { readSync, writeSync } from 'to-vfile';
+import Handlebars from 'handlebars';
+import chalk from 'chalk';
+import config from './constants.js';
 
 // Handlebars compile process for 'pages' files
 const generate = (fileName) => {
-  const file = vfile.readSync(
+  const file = readSync(
     `${path.join(
       process.cwd(),
       `${config.srcDirName}/${config.pagesDirName}`
@@ -16,7 +16,7 @@ const generate = (fileName) => {
 
   const template = Handlebars.compile(String(file));
 
-  file.contents = template({
+  file.value = template({
     publicRelativeFileDir: `${config.publicDirName}`,
   });
 
@@ -26,10 +26,10 @@ const generate = (fileName) => {
 
   file.path = filePath;
 
-  vfile.writeSync(file);
+  writeSync(file);
 };
 
-module.exports = () => {
+const generatePages = () => {
   fs.readdir(
     path.join(process.cwd(), `${config.srcDirName}/${config.pagesDirName}`),
     function (err, files) {
@@ -43,3 +43,5 @@ module.exports = () => {
     }
   );
 };
+
+export default generatePages;

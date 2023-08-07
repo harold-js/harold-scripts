@@ -1,23 +1,22 @@
-const path = require('path');
-const fs = require('fs');
-const fse = require('fs-extra');
-const chalk = require('chalk');
-const vfile = require('to-vfile');
-const unified = require('unified');
-const markdown = require('remark-parse');
-const remark2rehype = require('remark-rehype');
-const raw = require('rehype-raw');
-const matter = require('vfile-matter');
-const format = require('rehype-format');
-const html = require('rehype-stringify');
-const sanitize = require('rehype-sanitize');
-const sanitizeSchema = require('hast-util-sanitize/lib/github');
-const deepMerge = require('deepmerge');
-const Handlebars = require('handlebars');
+import path from 'node:path';
+import fs from 'node:fs';
+import fse from 'fs-extra';
+import chalk from 'chalk';
+import { readSync, writeSync } from 'to-vfile';
+import { unified } from 'unified';
+import markdown from 'remark-parse';
+import remark2rehype from 'remark-rehype';
+import raw from 'rehype-raw';
+import { matter } from 'vfile-matter';
+import format from 'rehype-format';
+import html from 'rehype-stringify';
+import sanitize from 'rehype-sanitize';
+import { defaultSchema } from 'hast-util-sanitize';
+import deepMerge from 'deepmerge';
+import Handlebars from 'handlebars';
+import config from './constants.js';
 
-const config = require('./constants');
-
-const schema = deepMerge(sanitizeSchema, {
+const schema = deepMerge(defaultSchema, {
   attributes: {
     '*': ['className'],
     iframe: ['src', 'width', 'height', 'allowFullScreen', 'allow'],
@@ -32,13 +31,16 @@ const requiredFrontMatterFieldsNames = config.frontMatterAvailableKeys
 
 // parse files with Front Matter fields
 const fileWithMatter = (fileName) => {
-  const file = vfile.readSync(
+  const file = readSync(
     `${path.join(
       process.cwd(),
       `${config.srcDirName}/${config.postsDirName}`
     )}/${fileName}`
   );
-  return matter(file, { strip: true });
+
+  matter(file, { strip: true });
+
+  return file;
 };
 
 // read .hbs layout file
@@ -80,7 +82,7 @@ const generate = (fileName) => {
         jsonPostsFileData.push({
           fileName: `${fileName.split('.')[0]}.html`,
           title: frontMatterSettings.title || '',
-          body: file.contents.replace(/\n/g, ' ').trim(),
+          body: file.value.replace(/\n/g, ' ').trim(),
           excerpt: frontMatterSettings.excerpt || '',
           publicationDate: frontMatterSettings.publicationDate || 0,
           tags: frontMatterSettings.tags || [],
@@ -88,7 +90,7 @@ const generate = (fileName) => {
         });
 
         // Prepare file with Handlebars template
-        file.contents = layoutTemplate({
+        file.value = layoutTemplate({
           ...frontMatterSettings,
           title: frontMatterSettings.title || fileName.split('.')[0],
           publicationDate:
@@ -99,7 +101,7 @@ const generate = (fileName) => {
                 `${config.srcDirName}/${config.postsDirName}`
               )}/${fileName}`
             ).ctimeMs,
-          content: file.contents,
+          content: file.value,
           publicRelativeFileDir: `${config.publicDirName}/${config.postsDirName}`,
         });
 
@@ -107,7 +109,7 @@ const generate = (fileName) => {
           config.postsDirName
         }/${fileName.split('.')[0]}.html`;
 
-        vfile.writeSync(file);
+        writeSync(file);
       } else {
         console.log(
           chalk.red(
@@ -123,7 +125,7 @@ const generate = (fileName) => {
     });
 };
 
-module.exports = () => {
+const generatePosts = () => {
   const postsSrcDirPath = path.join(
     process.cwd(),
     `${config.srcDirName}/${config.postsDirName}`
@@ -157,3 +159,5 @@ module.exports = () => {
     'utf8'
   );
 };
+
+export default generatePosts;

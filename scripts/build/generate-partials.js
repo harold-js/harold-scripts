@@ -1,11 +1,11 @@
-const path = require('path');
-const fs = require('fs');
-const vfile = require('to-vfile');
-const Handlebars = require('handlebars');
-const config = require('./constants');
+import path from 'node:path';
+import fs from 'node:fs';
+import { readSync } from 'to-vfile';
+import Handlebars from 'handlebars';
+import config from './constants.js';
 
 // Handlebars partials refister process
-module.exports = () => {
+const generatePartials = () => {
   const files = fs.readdirSync(
     path.join(process.cwd(), `${config.srcDirName}/${config.partialsDirName}`)
   );
@@ -14,7 +14,7 @@ module.exports = () => {
     const partialsObject = {};
 
     files.forEach((fileName) => {
-      const file = vfile.readSync(
+      const file = readSync(
         `${path.join(
           process.cwd(),
           `${config.srcDirName}/${config.partialsDirName}`
@@ -26,3 +26,5 @@ module.exports = () => {
     Handlebars.registerPartial(partialsObject);
   }
 };
+
+export default generatePartials;

@@ -1,10 +1,12 @@
-const fse = require('fs-extra');
-const config = require('./constants');
+import fse from 'fs-extra';
+import config from './constants.js';
 
-module.exports = () => {
+const copyAssets = () => {
   fse.removeSync(`${config.publicDirName}/${config.assetsDirName}`);
   fse.copySync(
     `${config.srcDirName}/${config.assetsDirName}`,
     `${config.publicDirName}/${config.assetsDirName}`
   );
 };
+
+export default copyAssets;
