@@ -1,6 +1,6 @@
 {
   "name": "harold-scripts",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Harold JS Scripts for Create Harold App",
   "author": "Julian Ćwirko (julian.io)",
   "engines": {
@@ -13,7 +13,7 @@
   "homepage": "https://www.haroldjs.com",
   "repository": {
     "type": "git",
-    "url": "https://github.com/juliancwirko/harold-scripts"
+    "url": "https://github.com/harold-js/harold-scripts"
   },
   "keywords": [
     "blogging",
@@ -35,7 +35,7 @@
     "cross-spawn": "7.0.3",
     "dateformat": "5.0.3",
     "deepmerge": "4.3.1",
-    "eslint": "8.46.0",
+    "eslint": "8.47.0",
     "eslint-config-prettier": "9.0.0",
     "eslint-plugin-prettier": "5.0.0",
     "fs-extra": "11.1.1",
@@ -50,7 +50,7 @@
     "rehype-stringify": "9.0.3",
     "remark-parse": "10.0.2",
     "remark-rehype": "10.1.0",
-    "sass": "1.64.2",
+    "sass": "1.65.1",
     "serve-handler": "6.1.5",
     "to-vfile": "8.0.0",
     "unified": "10.1.2",
