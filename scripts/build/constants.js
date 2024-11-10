@@ -1,6 +1,6 @@
 import { cosmiconfigSync } from 'cosmiconfig';
 
-const explorerSync = cosmiconfigSync('harold');
+const explorerSync = cosmiconfigSync('harold', { stopDir: process.cwd() });
 const loaded = explorerSync.search(`${process.cwd()}/src`);
 
 const config = {
