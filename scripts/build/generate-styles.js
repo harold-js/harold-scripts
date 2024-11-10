@@ -23,9 +23,11 @@ const generateStyles = () => {
         ['.scss', '.css'].includes(path.extname(fileName)) &&
         path.parse(fileName).name.charAt(0) !== '_'
       ) {
+        // TODO: migrate deprecated APIs
         const scssProcessResult = renderSync({
           file: fileName,
           sourceMap: true,
+          silenceDeprecations: ['legacy-js-api'],
         });
         fse
           .ensureDir(
