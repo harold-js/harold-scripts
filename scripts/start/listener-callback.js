@@ -7,8 +7,8 @@ import copyStatics from '../build/copy-statics.js';
 import build from '../build/build.js';
 
 // Operations for file changes listener
-const listenerCallback = (event, path) => {
-  build();
+const listenerCallback = async (event, path) => {
+  await build();
   if (path.includes(`${config.srcDirName}/${config.assetsDirName}`)) {
     copyAssets();
   }

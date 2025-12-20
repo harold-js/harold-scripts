@@ -27,6 +27,14 @@ const config = {
     loaded && loaded.config && loaded.config.hostDirName
       ? loaded.config.hostDirName
       : '',
+  minifyCss:
+    loaded && loaded.config && typeof loaded.config.minifyCss === 'boolean'
+      ? loaded.config.minifyCss
+      : true,
+  minifyHtml:
+    loaded && loaded.config && typeof loaded.config.minifyHtml === 'boolean'
+      ? loaded.config.minifyHtml
+      : true,
   frontMatterAvailableKeys: [
     {
       name: 'layout',

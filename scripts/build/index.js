@@ -4,17 +4,20 @@ import copyJSONData from './copy-json-data.js';
 import copyStatics from './copy-statics.js';
 import build from './build.js';
 
-// Prepare directories
-prepareDirectories();
+// Main build process
+(async () => {
+  // Prepare directories
+  prepareDirectories();
 
-// Copy assets
-copyAssets();
+  // Copy assets
+  copyAssets();
 
-// Build files
-build();
+  // Build files
+  await build();
 
-// Copy JSON data
-copyJSONData();
+  // Copy JSON data
+  copyJSONData();
 
-// Copy statics
-copyStatics();
+  // Copy statics
+  copyStatics();
+})();

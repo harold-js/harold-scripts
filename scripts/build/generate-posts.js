@@ -14,11 +14,15 @@ import sanitize from 'rehype-sanitize';
 import { defaultSchema } from 'hast-util-sanitize';
 import deepMerge from 'deepmerge';
 import Handlebars from 'handlebars';
+import rehypeImgAttrs from './rehype-img-attrs.js';
+import rehypeStyleWrappers from './rehype-style-wrappers.js';
+import minifyHtml from './minify-html.js';
 import config from './constants.js';
 
 const schema = deepMerge(defaultSchema, {
   attributes: {
     '*': ['className'],
+    img: ['src', 'alt', 'title', 'width', 'height', 'loading', 'decoding'],
     iframe: ['src', 'width', 'height', 'allowFullScreen', 'allow'],
   },
   tagNames: ['iframe'],
@@ -54,82 +58,105 @@ const getLayout = (layout) => {
   );
 };
 
-const generate = (fileName) => {
-  unified()
-    .use(markdown)
-    .use(remark2rehype, { allowDangerousHtml: true })
-    .use(raw)
-    .use(format)
-    .use(html)
-    .use(sanitize, schema)
-    .process(fileWithMatter(fileName), function (err, file) {
-      if (err) {
-        console.log(chalk.red('Something is wrong with the file!'));
-      }
+const generate = async (fileName) => {
+  return new Promise((resolve, reject) => {
+    unified()
+      .use(markdown)
+      .use(remark2rehype, { allowDangerousHtml: true })
+      .use(raw)
+      .use(rehypeStyleWrappers)
+      .use(rehypeImgAttrs, {
+        publicPath: config.publicDirName,
+        srcPath: config.srcDirName,
+      })
+      .use(format)
+      .use(html)
+      .use(sanitize, schema)
+      .process(fileWithMatter(fileName), async function (err, file) {
+        if (err) {
+          console.log(chalk.red('Something is wrong with the file!'));
+          reject(err);
+          return;
+        }
 
-      const frontMatterSettings = file && file.data && file.data.matter;
-      const frontMatterFields = Object.keys(frontMatterSettings || {});
-      const hasRequiredFields = requiredFrontMatterFieldsNames.every((r) =>
-        frontMatterFields.includes(r)
-      );
-
-      if (hasRequiredFields) {
-        const layoutTemplate = Handlebars.compile(
-          getLayout(frontMatterSettings.layout)
+        const frontMatterSettings = file && file.data && file.data.matter;
+        const frontMatterFields = Object.keys(frontMatterSettings || {});
+        const hasRequiredFields = requiredFrontMatterFieldsNames.every((r) =>
+          frontMatterFields.includes(r)
         );
 
-        // Prepare data for json file with all posts data
-        jsonPostsFileData.push({
-          fileName: `${fileName.split('.')[0]}.html`,
-          title: frontMatterSettings.title || '',
-          body: file.value.replace(/\n/g, ' ').trim(),
-          excerpt: frontMatterSettings.excerpt || '',
-          publicationDate: frontMatterSettings.publicationDate || 0,
-          tags: frontMatterSettings.tags || [],
-          coverImage: frontMatterSettings.coverImage || '',
-        });
+        if (hasRequiredFields) {
+          const layoutTemplate = Handlebars.compile(
+            getLayout(frontMatterSettings.layout)
+          );
 
-        // Prepare file with Handlebars template
-        file.value = layoutTemplate({
-          ...frontMatterSettings,
-          title: frontMatterSettings.title || fileName.split('.')[0],
-          publicationDate:
-            frontMatterSettings.publicationDate ||
-            fs.statSync(
-              `${path.join(
-                process.cwd(),
-                `${config.srcDirName}/${config.postsDirName}`
-              )}/${fileName}`
-            ).ctimeMs,
-          content: file.value,
-          publicRelativeFileDir: `${config.publicDirName}/${config.postsDirName}`,
-        });
+          // Prepare data for json file with all posts data
+          jsonPostsFileData.push({
+            fileName: `${fileName.split('.')[0]}.html`,
+            title: frontMatterSettings.title || '',
+            body: file.value.replace(/\n/g, ' ').trim(),
+            excerpt: frontMatterSettings.excerpt || '',
+            publicationDate: frontMatterSettings.publicationDate || 0,
+            tags: frontMatterSettings.tags || [],
+            coverImage: frontMatterSettings.coverImage || '',
+          });
 
-        file.path = `${path.join(process.cwd(), config.publicDirName)}/${
-          config.postsDirName
-        }/${fileName.split('.')[0]}.html`;
+          // Prepare file with Handlebars template
+          file.value = layoutTemplate({
+            ...frontMatterSettings,
+            title: frontMatterSettings.title || fileName.split('.')[0],
+            publicationDate:
+              frontMatterSettings.publicationDate ||
+              fs.statSync(
+                `${path.join(
+                  process.cwd(),
+                  `${config.srcDirName}/${config.postsDirName}`
+                )}/${fileName}`
+              ).ctimeMs,
+            content: file.value,
+            publicRelativeFileDir: `${config.publicDirName}/${config.postsDirName}`,
+          });
 
-        writeSync(file);
-      } else {
-        console.log(
-          chalk.red(
-            `Missing Front Matter keys for ${chalk.white.bgRed.bold(
-              fileName
-            )}. Required keys are: ${chalk.bold.underline(
-              requiredFrontMatterFieldsNames.join(', ')
-            )}. File was not generated!
-            `
-          )
-        );
-      }
-    });
+          // Minify HTML if enabled
+          file.value = await minifyHtml(file.value);
+
+          file.path = `${path.join(process.cwd(), config.publicDirName)}/${
+            config.postsDirName
+          }/${fileName.split('.')[0]}.html`;
+
+          writeSync(file);
+          resolve();
+        } else {
+          console.log(
+            chalk.red(
+              `Missing Front Matter keys for ${chalk.white.bgRed.bold(
+                fileName
+              )}. Required keys are: ${chalk.bold.underline(
+                requiredFrontMatterFieldsNames.join(', ')
+              )}. File was not generated!
+              `
+            )
+          );
+          resolve();
+        }
+      });
+  });
 };
 
-const generatePosts = () => {
+const generatePosts = async () => {
   const postsSrcDirPath = path.join(
     process.cwd(),
     `${config.srcDirName}/${config.postsDirName}`
   );
+
+  // Skip if posts directory doesn't exist
+  if (!fs.existsSync(postsSrcDirPath)) {
+    console.log(
+      chalk.yellow('No posts directory found. Skipping posts generation.')
+    );
+    return;
+  }
+
   const postsPublicDirPath = path.join(
     process.cwd(),
     `${config.publicDirName}/${config.postsDirName}`
@@ -140,12 +167,29 @@ const generatePosts = () => {
   const jsonPostsFilePath = `${jsonDirPath}/posts.json`;
   jsonPostsFileData = [];
 
+  // Ensure public posts directory exists before emptying
+  fse.ensureDirSync(postsPublicDirPath);
   fse.emptyDirSync(postsPublicDirPath);
 
   const postsInSrc = fs.readdirSync(postsSrcDirPath);
-  postsInSrc.forEach(function (fileName) {
-    generate(fileName);
-  });
+
+  // Filter only markdown files
+  const markdownFiles = postsInSrc.filter(
+    (fileName) => fileName.endsWith('.md') || fileName.endsWith('.markdown')
+  );
+
+  // Skip if no markdown files found
+  if (markdownFiles.length === 0) {
+    console.log(
+      chalk.yellow(
+        'No markdown files found in posts directory. Skipping posts generation.'
+      )
+    );
+    return;
+  }
+
+  // Process all posts (now async)
+  await Promise.all(markdownFiles.map((fileName) => generate(fileName)));
 
   if (!fs.existsSync(jsonDirPath)) {
     fs.mkdirSync(jsonDirPath);

@@ -2,6 +2,7 @@ import fs from 'node:fs';
 import path from 'node:path';
 import Handlebars from 'handlebars';
 import dateFormat from 'dateformat';
+import sizeOf from 'image-size';
 import chalk from 'chalk';
 import config from './constants.js';
 
@@ -19,6 +20,73 @@ const registerHelpers = () => {
 
     hostDirName: function () {
       return config.hostDirName;
+    },
+
+    // Responsive image helper with lazy loading and dimensions
+    responsiveImg: function (options) {
+      const {
+        src,
+        alt = '',
+        width,
+        height,
+        loading = 'lazy',
+        decoding = 'async',
+        className = '',
+        sizes,
+        srcset,
+      } = options.hash;
+
+      if (!src) {
+        console.log(chalk.red.bold('responsiveImg requires a src attribute'));
+        return '';
+      }
+
+      const relativeSrc = getRelativePath(
+        `${config.publicDirName}/${src}`,
+        options
+      );
+
+      let imgAttrs = `src="${relativeSrc}" alt="${alt || ''}"`;
+
+      // Add dimensions if provided
+      if (width) imgAttrs += ` width="${width}"`;
+      if (height) imgAttrs += ` height="${height}"`;
+
+      // Try to get dimensions automatically if not provided
+      if ((!width || !height) && !src.startsWith('http')) {
+        try {
+          const imagePath = path.join(process.cwd(), config.publicDirName, src);
+          if (fs.existsSync(imagePath)) {
+            const dimensions = sizeOf(imagePath);
+            if (!width && dimensions.width)
+              imgAttrs += ` width="${dimensions.width}"`;
+            if (!height && dimensions.height)
+              imgAttrs += ` height="${dimensions.height}"`;
+          }
+        } catch {
+          // Silently fail
+        }
+      }
+
+      // Add loading and decoding attributes
+      imgAttrs += ` loading="${loading}" decoding="${decoding}"`;
+
+      // Add srcset if provided
+      if (srcset) {
+        imgAttrs += ` srcset="${srcset}"`;
+      }
+
+      // Add sizes if provided
+      if (sizes) {
+        imgAttrs += ` sizes="${sizes}"`;
+      }
+
+      // Add class if provided
+      if (className) {
+        imgAttrs += ` class="${className}"`;
+      }
+
+      return new Handlebars.SafeString(`<img ${imgAttrs} />`);
     },
 
     formatDate: function (options) {
@@ -108,7 +176,7 @@ const registerHelpers = () => {
                               options
                             )}"><img src='${item.coverImage}' alt="${
                               item.title
-                            }" /></a></div>`
+                            }" loading="lazy" decoding="async" /></a></div>`
                           : ''
                       }
                       ${

@@ -3,10 +3,11 @@ import fs from 'node:fs';
 import { readSync, writeSync } from 'to-vfile';
 import Handlebars from 'handlebars';
 import chalk from 'chalk';
+import minifyHtml from './minify-html.js';
 import config from './constants.js';
 
 // Handlebars compile process for 'pages' files
-const generate = (fileName) => {
+const generate = async (fileName) => {
   const file = readSync(
     `${path.join(
       process.cwd(),
@@ -20,6 +21,9 @@ const generate = (fileName) => {
     publicRelativeFileDir: `${config.publicDirName}`,
   });
 
+  // Minify HTML if enabled
+  file.value = await minifyHtml(file.value);
+
   const filePath = `${path.join(process.cwd(), config.publicDirName)}/${
     path.parse(fileName).name
   }.html`;
@@ -29,19 +33,36 @@ const generate = (fileName) => {
   writeSync(file);
 };
 
-const generatePages = () => {
-  fs.readdir(
-    path.join(process.cwd(), `${config.srcDirName}/${config.pagesDirName}`),
-    function (err, files) {
-      if (err) {
-        console.log(chalk.red('Error getting directory information.'));
-      } else {
-        files.forEach(function (fileName) {
-          generate(fileName);
-        });
-      }
-    }
+const generatePages = async () => {
+  const pagesSrcPath = path.join(
+    process.cwd(),
+    `${config.srcDirName}/${config.pagesDirName}`
   );
+
+  // Skip if pages directory doesn't exist
+  if (!fs.existsSync(pagesSrcPath)) {
+    console.log(
+      chalk.yellow('No pages directory found. Skipping pages generation.')
+    );
+    return;
+  }
+
+  const files = fs.readdirSync(pagesSrcPath);
+
+  // Filter only .hbs files
+  const hbsFiles = files.filter((fileName) => fileName.endsWith('.hbs'));
+
+  if (hbsFiles.length === 0) {
+    console.log(
+      chalk.yellow(
+        'No .hbs files found in pages directory. Skipping pages generation.'
+      )
+    );
+    return;
+  }
+
+  // Process all pages (now async)
+  await Promise.all(hbsFiles.map((fileName) => generate(fileName)));
 };
 
 export default generatePages;
