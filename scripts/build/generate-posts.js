@@ -18,6 +18,11 @@ import rehypeImgAttrs from './rehype-img-attrs.js';
 import rehypeStyleWrappers from './rehype-style-wrappers.js';
 import minifyHtml from './minify-html.js';
 import config from './constants.js';
+import {
+  normalizeLineEndings,
+  hasRequiredFields,
+  extractFrontMatter,
+} from './utils.js';
 
 const schema = deepMerge(defaultSchema, {
   attributes: {
@@ -41,6 +46,12 @@ const fileWithMatter = (fileName) => {
       `${config.srcDirName}/${config.postsDirName}`
     )}/${fileName}`
   );
+
+  // Normalize line endings to LF to handle CRLF (Windows) files
+  // This prevents front matter parsing issues with different line endings
+  if (file.value) {
+    file.value = normalizeLineEndings(file.value);
+  }
 
   matter(file, { strip: true });
 
@@ -79,13 +90,14 @@ const generate = async (fileName) => {
           return;
         }
 
-        const frontMatterSettings = file && file.data && file.data.matter;
+        const frontMatterSettings = extractFrontMatter(file);
         const frontMatterFields = Object.keys(frontMatterSettings || {});
-        const hasRequiredFields = requiredFrontMatterFieldsNames.every((r) =>
-          frontMatterFields.includes(r)
+        const hasAllRequiredFields = hasRequiredFields(
+          frontMatterSettings,
+          requiredFrontMatterFieldsNames
         );
 
-        if (hasRequiredFields) {
+        if (hasAllRequiredFields) {
           const layoutTemplate = Handlebars.compile(
             getLayout(frontMatterSettings.layout)
           );

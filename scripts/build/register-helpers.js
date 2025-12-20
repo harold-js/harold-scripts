@@ -5,6 +5,7 @@ import dateFormat from 'dateformat';
 import sizeOf from 'image-size';
 import chalk from 'chalk';
 import config from './constants.js';
+import { chunkArray, sortPostsByDate, filterPostsByTag } from './utils.js';
 
 const dformat = dateFormat;
 
@@ -127,33 +128,12 @@ const registerHelpers = () => {
         ? fs.readFileSync(postsJsonFile)
         : [];
 
-      const chunkArray = (array, size) => {
-        const result = [];
-        if (Array.isArray(array)) {
-          for (let i = 0; i < array.length; i += size) {
-            const chunk = array.slice(i, i + size);
-            result.push(chunk);
-          }
-        }
-        return result;
-      };
-
       if (posts && posts.length > 0) {
-        let postsSortedAndFiltered = [];
-
-        const sorted = JSON.parse(posts).sort(
-          (a, b) =>
-            new Date(b.publicationDate).getTime() -
-            new Date(a.publicationDate).getTime()
-        );
-
-        postsSortedAndFiltered = sorted;
-
-        if (byTagName) {
-          postsSortedAndFiltered = postsSortedAndFiltered.filter((post) =>
-            post.tags.includes(byTagName)
-          );
-        }
+        const parsed = JSON.parse(posts);
+        const sorted = sortPostsByDate(parsed);
+        const postsSortedAndFiltered = byTagName 
+          ? filterPostsByTag(sorted, byTagName)
+          : sorted;
 
         const chunked = chunkArray(
           postsSortedAndFiltered,
