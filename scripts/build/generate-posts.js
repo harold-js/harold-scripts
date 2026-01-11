@@ -2,6 +2,7 @@ import path from 'node:path';
 import fs from 'node:fs';
 import fse from 'fs-extra';
 import chalk from 'chalk';
+import { glob } from 'glob';
 import { readSync, writeSync } from 'to-vfile';
 import { unified } from 'unified';
 import markdown from 'remark-parse';
@@ -39,12 +40,14 @@ const requiredFrontMatterFieldsNames = config.frontMatterAvailableKeys
   .map((requiredField) => requiredField.name);
 
 // parse files with Front Matter fields
-const fileWithMatter = (fileName) => {
+const fileWithMatter = (relativePath) => {
   const file = readSync(
-    `${path.join(
+    path.join(
       process.cwd(),
-      `${config.srcDirName}/${config.postsDirName}`
-    )}/${fileName}`
+      config.srcDirName,
+      config.postsDirName,
+      relativePath
+    )
   );
 
   // Normalize line endings to LF to handle CRLF (Windows) files
@@ -69,8 +72,17 @@ const getLayout = (layout) => {
   );
 };
 
-const generate = async (fileName) => {
+const generate = async (relativePath) => {
   return new Promise((resolve, reject) => {
+    // Extract base name for title fallback
+    const baseName = path.basename(relativePath, path.extname(relativePath));
+    const fullFilePath = path.join(
+      process.cwd(),
+      config.srcDirName,
+      config.postsDirName,
+      relativePath
+    );
+
     unified()
       .use(markdown)
       .use(remark2rehype, { allowDangerousHtml: true })
@@ -83,7 +95,7 @@ const generate = async (fileName) => {
       .use(format)
       .use(html)
       .use(sanitize, schema)
-      .process(fileWithMatter(fileName), async function (err, file) {
+      .process(fileWithMatter(relativePath), async function (err, file) {
         if (err) {
           console.log(chalk.red('Something is wrong with the file!'));
           reject(err);
@@ -91,7 +103,6 @@ const generate = async (fileName) => {
         }
 
         const frontMatterSettings = extractFrontMatter(file);
-        const frontMatterFields = Object.keys(frontMatterSettings || {});
         const hasAllRequiredFields = hasRequiredFields(
           frontMatterSettings,
           requiredFrontMatterFieldsNames
@@ -102,9 +113,32 @@ const generate = async (fileName) => {
             getLayout(frontMatterSettings.layout)
           );
 
+          // Calculate output directory preserving subdirectory structure
+          const dirPath = path.dirname(relativePath);
+          const outputDir =
+            dirPath === '.' || dirPath === ''
+              ? path.join(process.cwd(), config.publicDirName, config.postsDirName)
+              : path.join(
+                  process.cwd(),
+                  config.publicDirName,
+                  config.postsDirName,
+                  dirPath
+                );
+
+          // Ensure output directory exists
+          fse.ensureDirSync(outputDir);
+
+          const outputFileName = `${baseName}.html`;
+
+          // Calculate fileName for JSON (includes relative path from posts root)
+          const jsonFileName =
+            dirPath === '.' || dirPath === ''
+              ? outputFileName
+              : path.join(dirPath, outputFileName).replace(/\\/g, '/'); // Normalize to forward slashes
+
           // Prepare data for json file with all posts data
           jsonPostsFileData.push({
-            fileName: `${fileName.split('.')[0]}.html`,
+            fileName: jsonFileName,
             title: frontMatterSettings.title || '',
             body: file.value.replace(/\n/g, ' ').trim(),
             excerpt: frontMatterSettings.excerpt || '',
@@ -113,28 +147,30 @@ const generate = async (fileName) => {
             coverImage: frontMatterSettings.coverImage || '',
           });
 
+          // Calculate relative path to public root for Handlebars context
+          const publicRelativeFileDir =
+            dirPath === '.' || dirPath === ''
+              ? `${config.publicDirName}/${config.postsDirName}`
+              : path
+                  .join(config.publicDirName, config.postsDirName, dirPath)
+                  .replace(/\\/g, '/');
+
           // Prepare file with Handlebars template
           file.value = layoutTemplate({
             ...frontMatterSettings,
-            title: frontMatterSettings.title || fileName.split('.')[0],
+            title: frontMatterSettings.title || baseName,
             publicationDate:
               frontMatterSettings.publicationDate ||
-              fs.statSync(
-                `${path.join(
-                  process.cwd(),
-                  `${config.srcDirName}/${config.postsDirName}`
-                )}/${fileName}`
-              ).ctimeMs,
+              fs.statSync(fullFilePath).ctimeMs,
             content: file.value,
-            publicRelativeFileDir: `${config.publicDirName}/${config.postsDirName}`,
+            publicRelativeFileDir: publicRelativeFileDir,
           });
 
           // Minify HTML if enabled
           file.value = await minifyHtml(file.value);
 
-          file.path = `${path.join(process.cwd(), config.publicDirName)}/${
-            config.postsDirName
-          }/${fileName.split('.')[0]}.html`;
+          // Set output file path
+          file.path = path.join(outputDir, outputFileName);
 
           writeSync(file);
           resolve();
@@ -142,7 +178,7 @@ const generate = async (fileName) => {
           console.log(
             chalk.red(
               `Missing Front Matter keys for ${chalk.white.bgRed.bold(
-                fileName
+                relativePath
               )}. Required keys are: ${chalk.bold.underline(
                 requiredFrontMatterFieldsNames.join(', ')
               )}. File was not generated!
@@ -183,12 +219,15 @@ const generatePosts = async () => {
   fse.ensureDirSync(postsPublicDirPath);
   fse.emptyDirSync(postsPublicDirPath);
 
-  const postsInSrc = fs.readdirSync(postsSrcDirPath);
-
-  // Filter only markdown files
-  const markdownFiles = postsInSrc.filter(
-    (fileName) => fileName.endsWith('.md') || fileName.endsWith('.markdown')
-  );
+  // Use glob for recursive file discovery
+  // Use pattern with cwd option for better cross-platform compatibility
+  const markdownFiles = glob.sync('**/*.{md,markdown}', {
+    cwd: postsSrcDirPath,
+    absolute: false,
+  }).map((relativePath) => {
+    // Return relative path (already relative when using cwd)
+    return relativePath;
+  });
 
   // Skip if no markdown files found
   if (markdownFiles.length === 0) {
@@ -201,7 +240,7 @@ const generatePosts = async () => {
   }
 
   // Process all posts (now async)
-  await Promise.all(markdownFiles.map((fileName) => generate(fileName)));
+  await Promise.all(markdownFiles.map((relativePath) => generate(relativePath)));
 
   if (!fs.existsSync(jsonDirPath)) {
     fs.mkdirSync(jsonDirPath);

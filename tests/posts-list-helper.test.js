@@ -463,5 +463,165 @@ describe('Posts List Helper', () => {
       fs.readFileSync.mock.restore();
     });
   });
+
+  describe('nested subdirectory support', () => {
+    // Sample posts with nested paths
+    const nestedPosts = [
+      {
+        layout: 'blog-post',
+        title: 'Root Post',
+        publicationDate: '2025-01-20',
+        excerpt: 'A post in the root',
+        tags: ['general'],
+        coverImage: '',
+        fileName: 'root-post.html', // Root file (backward compatible)
+      },
+      {
+        layout: 'blog-post',
+        title: 'Category Post',
+        publicationDate: '2025-01-18',
+        excerpt: 'A post in a category',
+        tags: ['javascript'],
+        coverImage: 'images/cat.jpg',
+        fileName: 'javascript/intro.html', // Single-level nesting
+      },
+      {
+        layout: 'blog-post',
+        title: 'Nested Post',
+        publicationDate: '2025-01-15',
+        excerpt: 'A deeply nested post',
+        tags: ['layouts'],
+        coverImage: '',
+        fileName: 'layouts/dashboards/admin-dashboard.html', // Multi-level nesting
+      },
+    ];
+
+    it('should handle posts with nested paths in fileName', () => {
+      mock.method(fs, 'existsSync', () => true);
+      mock.method(fs, 'readFileSync', () => JSON.stringify(nestedPosts));
+
+      const template = Handlebars.compile('{{postsList}}');
+      const result = template({ publicRelativeFileDir: 'build' });
+
+      // Should contain all post titles
+      assert.ok(result.includes('Root Post'), 'Should include root post');
+      assert.ok(result.includes('Category Post'), 'Should include category post');
+      assert.ok(result.includes('Nested Post'), 'Should include nested post');
+
+      fs.existsSync.mock.restore();
+      fs.readFileSync.mock.restore();
+    });
+
+    it('should construct correct URLs for nested posts', () => {
+      mock.method(fs, 'existsSync', () => true);
+      mock.method(fs, 'readFileSync', () => JSON.stringify(nestedPosts));
+
+      const template = Handlebars.compile('{{postsList}}');
+      const result = template({ publicRelativeFileDir: 'build' });
+
+      // Check that URLs include the nested paths (getRelativePath converts to relative paths)
+      // From 'build' to 'build/posts/root-post.html' = 'posts/root-post.html'
+      assert.ok(
+        result.includes('posts/root-post.html'),
+        'Should include root post URL'
+      );
+      assert.ok(
+        result.includes('posts/javascript/intro.html'),
+        'Should include single-level nested URL'
+      );
+      assert.ok(
+        result.includes('posts/layouts/dashboards/admin-dashboard.html'),
+        'Should include multi-level nested URL'
+      );
+
+      fs.existsSync.mock.restore();
+      fs.readFileSync.mock.restore();
+    });
+
+    it('should handle mixed structure (flat and nested posts together)', () => {
+      const mixedPosts = [
+        ...samplePosts, // Flat posts
+        ...nestedPosts.slice(1), // Nested posts
+      ];
+
+      mock.method(fs, 'existsSync', () => true);
+      mock.method(fs, 'readFileSync', () => JSON.stringify(mixedPosts));
+
+      const template = Handlebars.compile('{{postsList}}');
+      const result = template({ publicRelativeFileDir: 'build' });
+
+      // Should handle both flat and nested posts
+      assert.ok(result.includes('First Post'), 'Should include flat post');
+      assert.ok(
+        result.includes('posts/first-post.html'),
+        'Should include flat post URL'
+      );
+      assert.ok(result.includes('Category Post'), 'Should include nested post');
+      assert.ok(
+        result.includes('posts/javascript/intro.html'),
+        'Should include nested post URL'
+      );
+
+      fs.existsSync.mock.restore();
+      fs.readFileSync.mock.restore();
+    });
+
+    it('should sort nested posts correctly by date', () => {
+      mock.method(fs, 'existsSync', () => true);
+      mock.method(fs, 'readFileSync', () => JSON.stringify(nestedPosts));
+
+      const template = Handlebars.compile('{{postsList}}');
+      const result = template({ publicRelativeFileDir: 'build' });
+
+      // Should be sorted by date (newest first)
+      const rootIndex = result.indexOf('Root Post');
+      const categoryIndex = result.indexOf('Category Post');
+      const nestedIndex = result.indexOf('Nested Post');
+
+      assert.ok(
+        rootIndex < categoryIndex,
+        'Root post (newest) should appear before category post'
+      );
+      assert.ok(
+        categoryIndex < nestedIndex,
+        'Category post should appear before nested post (oldest)'
+      );
+
+      fs.existsSync.mock.restore();
+      fs.readFileSync.mock.restore();
+    });
+
+    it('should filter nested posts by tag correctly', () => {
+      mock.method(fs, 'existsSync', () => true);
+      mock.method(fs, 'readFileSync', () => JSON.stringify(nestedPosts));
+
+      const template = Handlebars.compile('{{postsList byTagName="javascript"}}');
+      const result = template({ publicRelativeFileDir: 'build' });
+
+      // Should only include posts with javascript tag
+      assert.ok(result.includes('Category Post'), 'Should include category post');
+      assert.ok(!result.includes('Root Post'), 'Should not include root post');
+      assert.ok(!result.includes('Nested Post'), 'Should not include nested post');
+
+      fs.existsSync.mock.restore();
+      fs.readFileSync.mock.restore();
+    });
+
+    it('should paginate nested posts correctly', () => {
+      mock.method(fs, 'existsSync', () => true);
+      mock.method(fs, 'readFileSync', () => JSON.stringify(nestedPosts));
+
+      const template = Handlebars.compile('{{postsList perPageLimit=2}}');
+      const result = template({ publicRelativeFileDir: 'build' });
+
+      // Should include first 2 posts (sorted by date)
+      assert.ok(result.includes('Root Post'), 'Should include root post');
+      assert.ok(result.includes('Category Post'), 'Should include category post');
+      assert.ok(!result.includes('Nested Post'), 'Should not include third post');
+
+      fs.existsSync.mock.restore();
+      fs.readFileSync.mock.restore();
+    });
+  });
 });
 

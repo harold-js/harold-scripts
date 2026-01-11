@@ -1,7 +1,6 @@
 import { describe, it, before } from 'node:test';
 import assert from 'node:assert';
 import Handlebars from 'handlebars';
-import dateFormat from 'dateformat';
 
 // Import the register helpers to test the actual helpers
 import registerHelpers from '../scripts/build/register-helpers.js';

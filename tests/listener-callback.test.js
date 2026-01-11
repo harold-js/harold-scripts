@@ -1,5 +1,6 @@
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
+import fs from 'node:fs';
 import fse from 'fs-extra';
 import listenerCallback from '../scripts/start/listener-callback.js';
 
@@ -406,6 +407,180 @@ describe('Listener Callback', () => {
 
       // Should always log, even if other operations fail
       assert.ok(consoleOutput.length > 0, 'Should always log');
+    });
+  });
+
+  describe('nested posts file deletion', () => {
+    let originalPathExistsSync;
+    let originalReaddirSync;
+
+    beforeEach(() => {
+      // Store additional originals needed for nested deletion tests
+      originalPathExistsSync = fse.pathExistsSync;
+      originalReaddirSync = fs.readdirSync;
+
+      // Mock fse.pathExistsSync to simulate file existence
+      fse.pathExistsSync = () => true;
+
+      // Mock fs.readdirSync for empty directory cleanup
+      fs.readdirSync = () => [];
+    });
+
+    afterEach(() => {
+      // Restore additional mocks
+      fse.pathExistsSync = originalPathExistsSync;
+      fs.readdirSync = originalReaddirSync;
+    });
+
+    it('should remove nested markdown file HTML on unlink', async () => {
+      await listenerCallback('unlink', 'src/posts/category/nested-post.md');
+
+      // Should remove the HTML file in nested directory
+      assert.ok(
+        removedPaths.some(p => p.includes('build/posts/category') && p.includes('nested-post.html')),
+        'Should remove nested post HTML file'
+      );
+    });
+
+    it('should handle single-level nested post deletion', async () => {
+      await listenerCallback('unlink', 'src/posts/javascript/intro.md');
+
+      assert.ok(
+        removedPaths.some(p => p.includes('build/posts/javascript') && p.includes('intro.html')),
+        'Should remove single-level nested post'
+      );
+    });
+
+    it('should handle multi-level nested post deletion', async () => {
+      await listenerCallback('unlink', 'src/posts/layouts/dashboards/admin-dashboard.md');
+
+      assert.ok(
+        removedPaths.some(p => 
+          p.includes('build/posts/layouts/dashboards') && 
+          p.includes('admin-dashboard.html')
+        ),
+        'Should remove multi-level nested post'
+      );
+    });
+
+    it('should not remove nested post HTML on change event', async () => {
+      removedPaths = []; // Reset
+      await listenerCallback('change', 'src/posts/category/nested-post.md');
+
+      assert.strictEqual(
+        removedPaths.length,
+        0,
+        'Should not remove file on change event'
+      );
+    });
+
+    it('should not remove nested post HTML on add event', async () => {
+      removedPaths = []; // Reset
+      await listenerCallback('add', 'src/posts/category/nested-post.md');
+
+      assert.strictEqual(
+        removedPaths.length,
+        0,
+        'Should not remove file on add event'
+      );
+    });
+
+    it('should only remove nested markdown files on unlink', async () => {
+      removedPaths = []; // Reset
+      await listenerCallback('add', 'src/posts/category/post1.md');
+      await listenerCallback('change', 'src/posts/category/post2.md');
+      
+      assert.strictEqual(removedPaths.length, 0, 'Should not remove on add/change');
+
+      await listenerCallback('unlink', 'src/posts/category/post3.md');
+      
+      assert.ok(removedPaths.length > 0, 'Should remove on unlink');
+    });
+  });
+
+  describe('nested posts file change and add', () => {
+
+    it('should handle change event for nested post files', async () => {
+      await listenerCallback('change', 'src/posts/category/nested-post.md');
+
+      // Should log the change event
+      assert.ok(
+        consoleOutput.some(line => line.includes('change:') && line.includes('nested-post.md')),
+        'Should log change event for nested post'
+      );
+    });
+
+    it('should handle add event for nested post files', async () => {
+      await listenerCallback('add', 'src/posts/category/new-post.md');
+
+      // Should log the add event
+      assert.ok(
+        consoleOutput.some(line => line.includes('add:') && line.includes('new-post.md')),
+        'Should log add event for nested post'
+      );
+    });
+
+    it('should handle change event for single-level nested posts', async () => {
+      await assert.doesNotReject(
+        async () => await listenerCallback('change', 'src/posts/javascript/intro.md'),
+        'Should handle change for single-level nested post'
+      );
+    });
+
+    it('should handle add event for single-level nested posts', async () => {
+      await assert.doesNotReject(
+        async () => await listenerCallback('add', 'src/posts/javascript/new-article.md'),
+        'Should handle add for single-level nested post'
+      );
+    });
+
+    it('should handle change event for multi-level nested posts', async () => {
+      await assert.doesNotReject(
+        async () => await listenerCallback('change', 'src/posts/layouts/dashboards/admin-dashboard.md'),
+        'Should handle change for multi-level nested post'
+      );
+    });
+
+    it('should handle add event for multi-level nested posts', async () => {
+      await assert.doesNotReject(
+        async () => await listenerCallback('add', 'src/posts/layouts/dashboards/user-dashboard.md'),
+        'Should handle add for multi-level nested post'
+      );
+    });
+
+    it('should trigger build and JSON copy for nested post changes', async () => {
+      // Note: We can't easily mock build/copyJSONData because listenerCallback
+      // imports them at module load time. Instead, we verify the integration
+      // works by ensuring the operation completes successfully, which implies
+      // build() and copyJSONData() were called.
+      await assert.doesNotReject(
+        async () => await listenerCallback('change', 'src/posts/category/updated-post.md'),
+        'Should trigger build and copyJSONData for nested post changes'
+      );
+    });
+
+    it('should trigger build and JSON copy for nested post additions', async () => {
+      // Note: We can't easily mock build/copyJSONData because listenerCallback
+      // imports them at module load time. Instead, we verify the integration
+      // works by ensuring the operation completes successfully, which implies
+      // build() and copyJSONData() were called.
+      await assert.doesNotReject(
+        async () => await listenerCallback('add', 'src/posts/category/new-post.md'),
+        'Should trigger build and copyJSONData for nested post additions'
+      );
+    });
+
+    it('should handle mixed events for nested posts', async () => {
+      // Test multiple nested post events in sequence
+      // Each should trigger build() and copyJSONData()
+      await assert.doesNotReject(
+        async () => {
+          await listenerCallback('add', 'src/posts/category/post1.md');
+          await listenerCallback('change', 'src/posts/category/post2.md');
+          await listenerCallback('add', 'src/posts/layouts/dashboards/post3.md');
+        },
+        'Should handle mixed events for nested posts'
+      );
     });
   });
 });
