@@ -1,6 +1,6 @@
 {
   "name": "harold-scripts",
-  "version": "1.4.0",
+  "version": "1.4.1",
   "description": "Harold JS Scripts for Create Harold App",
   "author": "Julian Ćwirko (julian.io)",
   "engines": {
@@ -26,7 +26,8 @@
     "test": "node --test",
     "test:watch": "node --test --watch",
     "lint": "eslint . --fix",
-    "prettier": "prettier --write '**/*.{js,json}'"
+    "prettier": "prettier --write '**/*.{js,json}'",
+    "prepare": "husky"
   },
   "license": "MIT",
   "dependencies": {
@@ -65,6 +66,17 @@
     "eslint-config-prettier": "10.1.8",
     "eslint-plugin-prettier": "5.5.4",
     "globals": "16.5.0",
+    "husky": "^9.1.7",
+    "lint-staged": "^16.3.1",
     "prettier": "3.7.4"
+  },
+  "lint-staged": {
+    "*.js": [
+      "eslint --fix",
+      "prettier --write"
+    ],
+    "*.json": [
+      "prettier --write"
+    ]
   }
 }

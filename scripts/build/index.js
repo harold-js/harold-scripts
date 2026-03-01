@@ -1,3 +1,4 @@
+import chalk from 'chalk';
 import prepareDirectories from './prepare-dirs.js';
 import copyAssets from './copy-assets.js';
 import copyJSONData from './copy-json-data.js';
@@ -20,4 +21,6 @@ import build from './build.js';
 
   // Copy statics
   copyStatics();
+
+  process.stdout.write(`\r\x1b[K${chalk.green('Ready.')}\n`);
 })();

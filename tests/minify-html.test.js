@@ -1,4 +1,4 @@
-import { describe, it, mock } from 'node:test';
+import { describe, it } from 'node:test';
 import assert from 'node:assert';
 import minifyHtml from '../scripts/build/minify-html.js';
 
@@ -146,10 +146,6 @@ describe('HTML Minification', () => {
     const result = await minifyHtml(html);
 
     // Should keep closing slashes as per keepClosingSlash: true config
-    assert.ok(
-      result.includes('/>'),
-      'Should keep self-closing slashes'
-    );
+    assert.ok(result.includes('/>'), 'Should keep self-closing slashes');
   });
 });
-

@@ -62,11 +62,7 @@ describe('Copy Operations', () => {
 
       copyAssets();
 
-      assert.strictEqual(
-        copySyncCalls.length,
-        1,
-        'Should call copySync once'
-      );
+      assert.strictEqual(copySyncCalls.length, 1, 'Should call copySync once');
       assert.strictEqual(
         copySyncCalls[0].src,
         'src/assets',
@@ -156,11 +152,14 @@ describe('Copy Operations', () => {
       };
 
       // Should propagate error
-      assert.throws(() => {
-        copyAssets();
-      }, {
-        message: /Copy failed/,
-      });
+      assert.throws(
+        () => {
+          copyAssets();
+        },
+        {
+          message: /Copy failed/,
+        }
+      );
     });
 
     it('should use config values for directory names', () => {
@@ -186,11 +185,7 @@ describe('Copy Operations', () => {
 
       copyStatics();
 
-      assert.strictEqual(
-        copySyncCalls.length,
-        1,
-        'Should call copySync once'
-      );
+      assert.strictEqual(copySyncCalls.length, 1, 'Should call copySync once');
       assert.strictEqual(
         copySyncCalls[0].src,
         'src/statics',
@@ -253,11 +248,14 @@ describe('Copy Operations', () => {
       };
 
       // Should propagate error
-      assert.throws(() => {
-        copyStatics();
-      }, {
-        message: /Static copy failed/,
-      });
+      assert.throws(
+        () => {
+          copyStatics();
+        },
+        {
+          message: /Static copy failed/,
+        }
+      );
     });
 
     it('should use config values for directory names', () => {
@@ -278,11 +276,7 @@ describe('Copy Operations', () => {
 
       copyJSONData();
 
-      assert.strictEqual(
-        copySyncCalls.length,
-        1,
-        'Should call copySync once'
-      );
+      assert.strictEqual(copySyncCalls.length, 1, 'Should call copySync once');
       assert.strictEqual(
         copySyncCalls[0].src,
         'src/jsonData',
@@ -382,11 +376,14 @@ describe('Copy Operations', () => {
       };
 
       // Should propagate error
-      assert.throws(() => {
-        copyJSONData();
-      }, {
-        message: /JSON copy failed/,
-      });
+      assert.throws(
+        () => {
+          copyJSONData();
+        },
+        {
+          message: /JSON copy failed/,
+        }
+      );
     });
 
     it('should use config values for directory names', () => {
@@ -405,12 +402,12 @@ describe('Copy Operations', () => {
     it('should remove before copy for assets', () => {
       fse.pathExistsSync = () => true;
 
-      let executionOrder = [];
-      
+      const executionOrder = [];
+
       fse.removeSync = (dirPath) => {
         executionOrder.push({ action: 'remove', path: dirPath });
       };
-      
+
       fse.copySync = (src, dest) => {
         executionOrder.push({ action: 'copy', src, dest });
       };
@@ -432,12 +429,12 @@ describe('Copy Operations', () => {
     it('should remove before copy for jsonData', () => {
       fs.existsSync = () => true;
 
-      let executionOrder = [];
-      
+      const executionOrder = [];
+
       fse.removeSync = (dirPath) => {
         executionOrder.push({ action: 'remove', path: dirPath });
       };
-      
+
       fse.copySync = (src, dest) => {
         executionOrder.push({ action: 'copy', src, dest });
       };
@@ -518,4 +515,3 @@ describe('Copy Operations', () => {
     });
   });
 });
-

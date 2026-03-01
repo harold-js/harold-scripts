@@ -1,7 +1,6 @@
 import { describe, it, beforeEach, afterEach } from 'node:test';
 import assert from 'node:assert';
 import fs from 'node:fs';
-import path from 'node:path';
 import Handlebars from 'handlebars';
 import generatePages from '../scripts/build/generate-pages.js';
 
@@ -30,7 +29,7 @@ describe('Generate Pages', () => {
     writtenFiles = {};
 
     // Mock fs.mkdirSync to track directory creation
-    fs.mkdirSync = (dirPath, options) => {
+    fs.mkdirSync = () => {
       // Do nothing, just track
     };
 
@@ -102,7 +101,10 @@ describe('Generate Pages', () => {
       await generatePages();
 
       // Should create about.html and contact.html
-      assert.ok(writtenFiles['/test/build/about.html'], 'Should create about.html');
+      assert.ok(
+        writtenFiles['/test/build/about.html'],
+        'Should create about.html'
+      );
       assert.ok(
         writtenFiles['/test/build/contact.html'],
         'Should create contact.html'
@@ -125,9 +127,18 @@ describe('Generate Pages', () => {
       await generatePages();
 
       // All pages should be written
-      assert.ok(writtenFiles['/test/build/page1.html'], 'Should create page1.html');
-      assert.ok(writtenFiles['/test/build/page2.html'], 'Should create page2.html');
-      assert.ok(writtenFiles['/test/build/page3.html'], 'Should create page3.html');
+      assert.ok(
+        writtenFiles['/test/build/page1.html'],
+        'Should create page1.html'
+      );
+      assert.ok(
+        writtenFiles['/test/build/page2.html'],
+        'Should create page2.html'
+      );
+      assert.ok(
+        writtenFiles['/test/build/page3.html'],
+        'Should create page3.html'
+      );
 
       // Verify content
       assert.ok(writtenFiles['/test/build/page1.html'].includes('Page 1'));
@@ -260,8 +271,7 @@ describe('Generate Pages', () => {
     it('should handle Handlebars compilation errors', async () => {
       fs.existsSync = () => true;
       fs.readdirSync = () => ['broken.hbs'];
-      fs.readFileSync = () =>
-        Buffer.from('<html>{{#if unclosed}</html>'); // Malformed template
+      fs.readFileSync = () => Buffer.from('<html>{{#if unclosed}</html>'); // Malformed template
 
       // Should throw error
       await assert.rejects(
@@ -335,10 +345,7 @@ describe('Generate Pages', () => {
 
       const output = writtenFiles['/test/build/with-partial.html'];
       assert.ok(output, 'Should create output file');
-      assert.ok(
-        output.includes('Partial content'),
-        'Should render partial'
-      );
+      assert.ok(output.includes('Partial content'), 'Should render partial');
 
       // Cleanup
       Handlebars.unregisterPartial('test-partial');
@@ -371,7 +378,7 @@ describe('Generate Pages', () => {
 
       const output = writtenFiles['/test/build/minify-test.html'];
       assert.ok(output, 'Should create output file');
-      
+
       // Minified HTML should have less whitespace
       assert.ok(
         !output.includes('\n        '),
@@ -401,7 +408,7 @@ describe('Generate Pages', () => {
 
       const output = writtenFiles['/test/build/no-minify.html'];
       assert.ok(output, 'Should create output file');
-      
+
       // Should preserve formatting (though Handlebars may affect it slightly)
       assert.ok(output.includes('Test'), 'Should contain content');
 
@@ -420,10 +427,7 @@ describe('Generate Pages', () => {
 
       // Should write to build/test-page.html
       const expectedPath = '/test/build/test-page.html';
-      assert.ok(
-        writtenFiles[expectedPath],
-        `Should write to ${expectedPath}`
-      );
+      assert.ok(writtenFiles[expectedPath], `Should write to ${expectedPath}`);
     });
 
     it('should handle nested file paths correctly', async () => {
@@ -435,11 +439,7 @@ describe('Generate Pages', () => {
 
       // Should use first part before extension as filename
       const expectedPath = '/test/build/my.page.name.html';
-      assert.ok(
-        writtenFiles[expectedPath],
-        'Should handle dotted filenames'
-      );
+      assert.ok(writtenFiles[expectedPath], 'Should handle dotted filenames');
     });
   });
 });
-

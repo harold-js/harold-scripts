@@ -266,7 +266,7 @@ describe('Directory Preparation', () => {
   describe('error handling', () => {
     it('should handle permission errors when emptying directory', () => {
       fs.existsSync = () => false;
-      
+
       // Mock emptyDirSync to throw permission error
       fse.emptyDirSync = () => {
         const error = new Error('EACCES: permission denied');
@@ -275,30 +275,36 @@ describe('Directory Preparation', () => {
       };
 
       // Should propagate the error
-      assert.throws(() => {
-        prepareDirs();
-      }, {
-        message: /permission denied/i,
-      });
+      assert.throws(
+        () => {
+          prepareDirs();
+        },
+        {
+          message: /permission denied/i,
+        }
+      );
     });
 
     it('should handle errors when creating subdirectories', () => {
       fs.existsSync = () => true; // All directories exist
-      
+
       // Reset emptyDirSync to not throw
       fse.emptyDirSync = () => {};
-      
+
       // Mock ensureDirSync to throw error
       fse.ensureDirSync = () => {
         throw new Error('Failed to create directory');
       };
 
       // Should propagate the error
-      assert.throws(() => {
-        prepareDirs();
-      }, {
-        message: /Failed to create directory/,
-      });
+      assert.throws(
+        () => {
+          prepareDirs();
+        },
+        {
+          message: /Failed to create directory/,
+        }
+      );
     });
 
     it('should handle non-existent public directory by creating it', () => {
@@ -313,13 +319,16 @@ describe('Directory Preparation', () => {
 
       prepareDirs();
 
-      assert.ok(emptyDirCreated, 'Should call emptyDirSync to create/empty dir');
+      assert.ok(
+        emptyDirCreated,
+        'Should call emptyDirSync to create/empty dir'
+      );
     });
   });
 
   describe('path construction', () => {
     it('should construct correct paths using process.cwd()', () => {
-      let checkedPaths = [];
+      const checkedPaths = [];
       fs.existsSync = (dirPath) => {
         checkedPaths.push(dirPath);
         return true;
@@ -357,14 +366,14 @@ describe('Directory Preparation', () => {
 
   describe('execution order', () => {
     it('should empty public directory before creating subdirectories', () => {
-      let executionOrder = [];
-      
+      const executionOrder = [];
+
       fs.existsSync = () => true;
-      
+
       fse.emptyDirSync = (dirPath) => {
         executionOrder.push({ action: 'empty', path: dirPath });
       };
-      
+
       fse.ensureDirSync = (dirPath) => {
         executionOrder.push({ action: 'ensure', path: dirPath });
       };
@@ -377,7 +386,7 @@ describe('Directory Preparation', () => {
         'empty',
         'Should empty directory first'
       );
-      
+
       // All subsequent actions should be ensuring directories
       for (let i = 1; i < executionOrder.length; i++) {
         assert.strictEqual(
@@ -389,4 +398,3 @@ describe('Directory Preparation', () => {
     });
   });
 });
-

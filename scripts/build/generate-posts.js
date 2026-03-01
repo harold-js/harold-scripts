@@ -117,7 +117,11 @@ const generate = async (relativePath) => {
           const dirPath = path.dirname(relativePath);
           const outputDir =
             dirPath === '.' || dirPath === ''
-              ? path.join(process.cwd(), config.publicDirName, config.postsDirName)
+              ? path.join(
+                  process.cwd(),
+                  config.publicDirName,
+                  config.postsDirName
+                )
               : path.join(
                   process.cwd(),
                   config.publicDirName,
@@ -221,13 +225,15 @@ const generatePosts = async () => {
 
   // Use glob for recursive file discovery
   // Use pattern with cwd option for better cross-platform compatibility
-  const markdownFiles = glob.sync('**/*.{md,markdown}', {
-    cwd: postsSrcDirPath,
-    absolute: false,
-  }).map((relativePath) => {
-    // Return relative path (already relative when using cwd)
-    return relativePath;
-  });
+  const markdownFiles = glob
+    .sync('**/*.{md,markdown}', {
+      cwd: postsSrcDirPath,
+      absolute: false,
+    })
+    .map((relativePath) => {
+      // Return relative path (already relative when using cwd)
+      return relativePath;
+    });
 
   // Skip if no markdown files found
   if (markdownFiles.length === 0) {
@@ -240,7 +246,9 @@ const generatePosts = async () => {
   }
 
   // Process all posts (now async)
-  await Promise.all(markdownFiles.map((relativePath) => generate(relativePath)));
+  await Promise.all(
+    markdownFiles.map((relativePath) => generate(relativePath))
+  );
 
   if (!fs.existsSync(jsonDirPath)) {
     fs.mkdirSync(jsonDirPath);

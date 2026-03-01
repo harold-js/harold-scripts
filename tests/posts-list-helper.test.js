@@ -91,7 +91,11 @@ describe('Posts List Helper', () => {
       const template = Handlebars.compile('{{postsList}}');
       const result = template({ publicRelativeFileDir: 'build' });
 
-      assert.strictEqual(result, '', 'Should return empty string when no posts file');
+      assert.strictEqual(
+        result,
+        '',
+        'Should return empty string when no posts file'
+      );
 
       fs.existsSync.mock.restore();
     });
@@ -103,7 +107,11 @@ describe('Posts List Helper', () => {
       const template = Handlebars.compile('{{postsList}}');
       const result = template({ publicRelativeFileDir: 'build' });
 
-      assert.strictEqual(result, '', 'Should return empty string for empty posts');
+      assert.strictEqual(
+        result,
+        '',
+        'Should return empty string for empty posts'
+      );
 
       fs.existsSync.mock.restore();
       fs.readFileSync.mock.restore();
@@ -121,7 +129,10 @@ describe('Posts List Helper', () => {
       // Should include first 2 posts only
       assert.ok(result.includes('First Post'), 'Should include first post');
       assert.ok(result.includes('Second Post'), 'Should include second post');
-      assert.ok(!result.includes('Third Post'), 'Should not include third post');
+      assert.ok(
+        !result.includes('Third Post'),
+        'Should not include third post'
+      );
 
       fs.existsSync.mock.restore();
       fs.readFileSync.mock.restore();
@@ -137,8 +148,14 @@ describe('Posts List Helper', () => {
       const result = template({ publicRelativeFileDir: 'build' });
 
       // Should include only the third post (page 2 with limit 2)
-      assert.ok(!result.includes('First Post'), 'Should not include first post');
-      assert.ok(!result.includes('Second Post'), 'Should not include second post');
+      assert.ok(
+        !result.includes('First Post'),
+        'Should not include first post'
+      );
+      assert.ok(
+        !result.includes('Second Post'),
+        'Should not include second post'
+      );
       assert.ok(result.includes('Third Post'), 'Should include third post');
 
       fs.existsSync.mock.restore();
@@ -187,12 +204,17 @@ describe('Posts List Helper', () => {
       mock.method(fs, 'existsSync', () => true);
       mock.method(fs, 'readFileSync', () => JSON.stringify(samplePosts));
 
-      const template = Handlebars.compile('{{postsList byTagName="javascript"}}');
+      const template = Handlebars.compile(
+        '{{postsList byTagName="javascript"}}'
+      );
       const result = template({ publicRelativeFileDir: 'build' });
 
       // Should include posts with javascript tag
       assert.ok(result.includes('First Post'), 'Should include first post');
-      assert.ok(!result.includes('Second Post'), 'Should not include second post');
+      assert.ok(
+        !result.includes('Second Post'),
+        'Should not include second post'
+      );
       assert.ok(result.includes('Third Post'), 'Should include third post');
 
       fs.existsSync.mock.restore();
@@ -203,10 +225,16 @@ describe('Posts List Helper', () => {
       mock.method(fs, 'existsSync', () => true);
       mock.method(fs, 'readFileSync', () => JSON.stringify(samplePosts));
 
-      const template = Handlebars.compile('{{postsList byTagName="nonexistent"}}');
+      const template = Handlebars.compile(
+        '{{postsList byTagName="nonexistent"}}'
+      );
       const result = template({ publicRelativeFileDir: 'build' });
 
-      assert.strictEqual(result, '', 'Should return empty for non-existent tag');
+      assert.strictEqual(
+        result,
+        '',
+        'Should return empty for non-existent tag'
+      );
 
       fs.existsSync.mock.restore();
       fs.readFileSync.mock.restore();
@@ -223,7 +251,10 @@ describe('Posts List Helper', () => {
 
       // Should not contain image tags
       assert.ok(!result.includes('<img'), 'Should not include img tags');
-      assert.ok(!result.includes('coverImage'), 'Should not include cover image');
+      assert.ok(
+        !result.includes('coverImage'),
+        'Should not include cover image'
+      );
 
       fs.existsSync.mock.restore();
       fs.readFileSync.mock.restore();
@@ -357,11 +388,16 @@ describe('Posts List Helper', () => {
       mock.method(fs, 'existsSync', () => true);
       mock.method(fs, 'readFileSync', () => JSON.stringify(samplePosts));
 
-      const template = Handlebars.compile('{{postsList noReadMoreButton=true}}');
+      const template = Handlebars.compile(
+        '{{postsList noReadMoreButton=true}}'
+      );
       const result = template({ publicRelativeFileDir: 'build' });
 
       // Should not contain read more button
-      assert.ok(!result.includes('Read more'), 'Should not include read more button');
+      assert.ok(
+        !result.includes('Read more'),
+        'Should not include read more button'
+      );
 
       fs.existsSync.mock.restore();
       fs.readFileSync.mock.restore();
@@ -375,7 +411,10 @@ describe('Posts List Helper', () => {
       const result = template({ publicRelativeFileDir: 'build' });
 
       // Should contain read more button
-      assert.ok(result.includes('Read more'), 'Should include read more button');
+      assert.ok(
+        result.includes('Read more'),
+        'Should include read more button'
+      );
 
       fs.existsSync.mock.restore();
       fs.readFileSync.mock.restore();
@@ -408,7 +447,9 @@ describe('Posts List Helper', () => {
       mock.method(fs, 'existsSync', () => true);
       mock.method(fs, 'readFileSync', () => JSON.stringify(samplePosts));
 
-      const template = Handlebars.compile('{{postsList className="custom-posts"}}');
+      const template = Handlebars.compile(
+        '{{postsList className="custom-posts"}}'
+      );
       const result = template({ publicRelativeFileDir: 'build' });
 
       // Should contain custom class
@@ -438,7 +479,10 @@ describe('Posts List Helper', () => {
 
       // Should show only first javascript post
       assert.ok(result.includes('First Post'), 'Should include first post');
-      assert.ok(!result.includes('Third Post'), 'Should not include third post');
+      assert.ok(
+        !result.includes('Third Post'),
+        'Should not include third post'
+      );
 
       fs.existsSync.mock.restore();
       fs.readFileSync.mock.restore();
@@ -505,7 +549,10 @@ describe('Posts List Helper', () => {
 
       // Should contain all post titles
       assert.ok(result.includes('Root Post'), 'Should include root post');
-      assert.ok(result.includes('Category Post'), 'Should include category post');
+      assert.ok(
+        result.includes('Category Post'),
+        'Should include category post'
+      );
       assert.ok(result.includes('Nested Post'), 'Should include nested post');
 
       fs.existsSync.mock.restore();
@@ -595,13 +642,21 @@ describe('Posts List Helper', () => {
       mock.method(fs, 'existsSync', () => true);
       mock.method(fs, 'readFileSync', () => JSON.stringify(nestedPosts));
 
-      const template = Handlebars.compile('{{postsList byTagName="javascript"}}');
+      const template = Handlebars.compile(
+        '{{postsList byTagName="javascript"}}'
+      );
       const result = template({ publicRelativeFileDir: 'build' });
 
       // Should only include posts with javascript tag
-      assert.ok(result.includes('Category Post'), 'Should include category post');
+      assert.ok(
+        result.includes('Category Post'),
+        'Should include category post'
+      );
       assert.ok(!result.includes('Root Post'), 'Should not include root post');
-      assert.ok(!result.includes('Nested Post'), 'Should not include nested post');
+      assert.ok(
+        !result.includes('Nested Post'),
+        'Should not include nested post'
+      );
 
       fs.existsSync.mock.restore();
       fs.readFileSync.mock.restore();
@@ -616,12 +671,17 @@ describe('Posts List Helper', () => {
 
       // Should include first 2 posts (sorted by date)
       assert.ok(result.includes('Root Post'), 'Should include root post');
-      assert.ok(result.includes('Category Post'), 'Should include category post');
-      assert.ok(!result.includes('Nested Post'), 'Should not include third post');
+      assert.ok(
+        result.includes('Category Post'),
+        'Should include category post'
+      );
+      assert.ok(
+        !result.includes('Nested Post'),
+        'Should not include third post'
+      );
 
       fs.existsSync.mock.restore();
       fs.readFileSync.mock.restore();
     });
   });
 });
-

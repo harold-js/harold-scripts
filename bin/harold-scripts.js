@@ -11,6 +11,7 @@ const script = args ? args[2] : undefined;
 const additionalArgs = args.slice(3);
 
 if (script && ['start', 'build'].includes(script)) {
+  process.stdout.write('\r\x1b[K\x1b[36mBuilding...\x1b[0m');
   const result = spawn.sync(
     'node',
     [require.resolve('../scripts/' + script), ...additionalArgs],

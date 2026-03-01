@@ -8,16 +8,7 @@ import { fileURLToPath } from 'node:url';
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
-// Helper to create a simple 1x1 PNG image buffer
-const create1x1PNG = () => {
-  return Buffer.from(
-    'iVBORw0KGgoAAAANSUhEUgAAAAEAAAABCAYAAAAfFcSJAAAADUlEQVR42mNk+M9QDwADhgGAWjR9awAAAABJRU5ErkJggg==',
-    'base64'
-  );
-};
-
 describe('Rehype Image Attributes Plugin', () => {
-
   describe('loading attribute', () => {
     it('should add loading="lazy" to images without it', () => {
       const tree = {
@@ -203,7 +194,7 @@ describe('Rehype Image Attributes Plugin', () => {
       };
 
       const plugin = rehypeImgAttrs();
-      
+
       // Should not throw
       assert.doesNotThrow(() => {
         plugin(tree);
@@ -365,7 +356,7 @@ describe('Rehype Image Attributes Plugin', () => {
       };
 
       const plugin = rehypeImgAttrs();
-      
+
       assert.doesNotThrow(() => {
         plugin(tree);
       }, 'Should handle nodes without properties');
@@ -485,4 +476,3 @@ describe('Rehype Image Attributes Plugin', () => {
     });
   });
 });
-

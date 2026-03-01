@@ -355,11 +355,7 @@ describe('Rehype Style Wrappers Plugin', () => {
       const plugin = rehypeStyleWrappers();
       plugin(tree);
 
-      assert.strictEqual(
-        tree.children[0].tagName,
-        'iframe',
-        'Should not wrap'
-      );
+      assert.strictEqual(tree.children[0].tagName, 'iframe', 'Should not wrap');
       assert.strictEqual(
         tree.children[0].properties.src,
         'https://example.com/video?style=unknown',
@@ -505,4 +501,3 @@ describe('Rehype Style Wrappers Plugin', () => {
     });
   });
 });
-

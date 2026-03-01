@@ -14,7 +14,11 @@ describe('Front Matter Parsing', () => {
       const content = 'line1\r\nline2\r\nline3';
       const result = normalizeLineEndings(content);
 
-      assert.strictEqual(result, 'line1\nline2\nline3', 'Should convert CRLF to LF');
+      assert.strictEqual(
+        result,
+        'line1\nline2\nline3',
+        'Should convert CRLF to LF'
+      );
       assert.ok(!result.includes('\r\n'), 'Should not contain CRLF');
     });
 
@@ -41,7 +45,11 @@ describe('Front Matter Parsing', () => {
       const buffer = Buffer.from('line1\r\nline2\r\nline3', 'utf8');
       const result = normalizeLineEndings(buffer);
 
-      assert.strictEqual(result, 'line1\nline2\nline3', 'Should convert Buffer CRLF to LF');
+      assert.strictEqual(
+        result,
+        'line1\nline2\nline3',
+        'Should convert Buffer CRLF to LF'
+      );
       assert.strictEqual(typeof result, 'string', 'Should return string');
     });
 
@@ -49,7 +57,11 @@ describe('Front Matter Parsing', () => {
       const buffer = Buffer.from('line1\nline2\nline3', 'utf8');
       const result = normalizeLineEndings(buffer);
 
-      assert.strictEqual(result, 'line1\nline2\nline3', 'Should preserve Buffer LF');
+      assert.strictEqual(
+        result,
+        'line1\nline2\nline3',
+        'Should preserve Buffer LF'
+      );
     });
 
     it('should handle empty string', () => {
@@ -63,14 +75,22 @@ describe('Front Matter Parsing', () => {
       const resultUndefined = normalizeLineEndings(undefined);
 
       assert.strictEqual(resultNull, null, 'Should return null for null');
-      assert.strictEqual(resultUndefined, undefined, 'Should return undefined for undefined');
+      assert.strictEqual(
+        resultUndefined,
+        undefined,
+        'Should return undefined for undefined'
+      );
     });
 
     it('should handle content without line breaks', () => {
       const content = 'single line content';
       const result = normalizeLineEndings(content);
 
-      assert.strictEqual(result, 'single line content', 'Should preserve single line');
+      assert.strictEqual(
+        result,
+        'single line content',
+        'Should preserve single line'
+      );
     });
   });
 
@@ -85,7 +105,11 @@ describe('Front Matter Parsing', () => {
 
       const result = hasRequiredFields(obj, required);
 
-      assert.strictEqual(result, true, 'Should validate all required fields present');
+      assert.strictEqual(
+        result,
+        true,
+        'Should validate all required fields present'
+      );
     });
 
     it('should return false when required fields are missing', () => {
@@ -131,7 +155,11 @@ describe('Front Matter Parsing', () => {
 
       const result = hasRequiredFields(obj, required);
 
-      assert.strictEqual(result, true, 'Should return true when no fields required');
+      assert.strictEqual(
+        result,
+        true,
+        'Should return true when no fields required'
+      );
     });
 
     it('should handle null object', () => {
@@ -149,7 +177,11 @@ describe('Front Matter Parsing', () => {
 
       const result = hasRequiredFields(obj, required);
 
-      assert.strictEqual(result, false, 'Should return false for undefined object');
+      assert.strictEqual(
+        result,
+        false,
+        'Should return false for undefined object'
+      );
     });
 
     it('should handle non-array required fields', () => {
@@ -158,7 +190,11 @@ describe('Front Matter Parsing', () => {
 
       const result = hasRequiredFields(obj, required);
 
-      assert.strictEqual(result, false, 'Should return false for non-array required fields');
+      assert.strictEqual(
+        result,
+        false,
+        'Should return false for non-array required fields'
+      );
     });
 
     it('should handle fields with falsy values', () => {
@@ -205,7 +241,11 @@ describe('Front Matter Parsing', () => {
 
       const result = extractFrontMatter(file);
 
-      assert.strictEqual(result, null, 'Should return null for file without data');
+      assert.strictEqual(
+        result,
+        null,
+        'Should return null for file without data'
+      );
     });
 
     it('should return null when file has no matter', () => {
@@ -215,7 +255,11 @@ describe('Front Matter Parsing', () => {
 
       const result = extractFrontMatter(file);
 
-      assert.strictEqual(result, null, 'Should return null for file without matter');
+      assert.strictEqual(
+        result,
+        null,
+        'Should return null for file without matter'
+      );
     });
 
     it('should return null for null file', () => {
@@ -363,7 +407,11 @@ Content.`;
 
       assert.ok(Array.isArray(frontMatter.tags), 'Tags should be an array');
       assert.strictEqual(frontMatter.tags.length, 3);
-      assert.deepStrictEqual(frontMatter.tags, ['tag-one', 'tag-two', 'tag-three']);
+      assert.deepStrictEqual(frontMatter.tags, [
+        'tag-one',
+        'tag-two',
+        'tag-three',
+      ]);
     });
 
     it('should handle file without front matter', () => {
@@ -426,8 +474,11 @@ Content.`;
 
       const isValid = hasRequiredFields(frontMatter, required);
 
-      assert.strictEqual(isValid, false, 'Should detect missing publicationDate');
+      assert.strictEqual(
+        isValid,
+        false,
+        'Should detect missing publicationDate'
+      );
     });
   });
 });
-

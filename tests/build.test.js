@@ -9,11 +9,6 @@ import build from '../scripts/build/build.js';
 
 describe('Build Entry Point', () => {
   let callOrder;
-  let mockGeneratePosts;
-  let mockGeneratePages;
-  let mockGeneratePartials;
-  let mockRegisterHelpers;
-  let mockGenerateStyles;
   let originalConsoleLog;
 
   beforeEach(() => {
@@ -25,23 +20,23 @@ describe('Build Entry Point', () => {
     callOrder = [];
 
     // Mock all build functions using Node's mock API
-    mockGeneratePosts = mock.fn(generatePosts, async () => {
+    mock.fn(generatePosts, async () => {
       callOrder.push('generatePosts');
     });
 
-    mockGeneratePages = mock.fn(generatePages, async () => {
+    mock.fn(generatePages, async () => {
       callOrder.push('generatePages');
     });
 
-    mockGeneratePartials = mock.fn(generatePartials, () => {
+    mock.fn(generatePartials, () => {
       callOrder.push('generatePartials');
     });
 
-    mockRegisterHelpers = mock.fn(registerHelpers, () => {
+    mock.fn(registerHelpers, () => {
       callOrder.push('registerHelpers');
     });
 
-    mockGenerateStyles = mock.fn(generateStyles, async () => {
+    mock.fn(generateStyles, async () => {
       callOrder.push('generateStyles');
     });
   });
@@ -54,7 +49,11 @@ describe('Build Entry Point', () => {
   describe('module exports', () => {
     it('should export build as default', () => {
       assert.ok(build, 'Should have default export');
-      assert.strictEqual(typeof build, 'function', 'Default export should be a function');
+      assert.strictEqual(
+        typeof build,
+        'function',
+        'Default export should be a function'
+      );
     });
 
     it('should export an async function', () => {
@@ -68,7 +67,7 @@ describe('Build Entry Point', () => {
     it('should coordinate all build operations', async () => {
       // Build function exists and can be called
       assert.ok(typeof build === 'function', 'build should be a function');
-      
+
       // Should complete without errors (with real implementations)
       await assert.doesNotReject(
         async () => await build(),
@@ -78,13 +77,10 @@ describe('Build Entry Point', () => {
 
     it('should be callable multiple times', async () => {
       // Should allow multiple builds
-      await assert.doesNotReject(
-        async () => {
-          await build();
-          await build();
-        },
-        'Should be callable multiple times'
-      );
+      await assert.doesNotReject(async () => {
+        await build();
+        await build();
+      }, 'Should be callable multiple times');
     });
   });
 
@@ -93,7 +89,7 @@ describe('Build Entry Point', () => {
       // The build function orchestrates multiple operations
       // This validates it completes successfully
       const result = await build();
-      
+
       // Build returns undefined (fire-and-forget style)
       assert.strictEqual(result, undefined, 'Build should complete');
     });
@@ -101,13 +97,13 @@ describe('Build Entry Point', () => {
     it('should handle async operations correctly', async () => {
       // Verify build waits for async operations
       let asyncFlag = false;
-      
+
       // This test validates the async nature
       const buildPromise = build();
-      
+
       // Build is async, so this happens before build completes
       assert.strictEqual(asyncFlag, false, 'Should be async');
-      
+
       await buildPromise;
       // Now we can set the flag
       asyncFlag = true;
@@ -118,27 +114,42 @@ describe('Build Entry Point', () => {
   describe('expected build operations', () => {
     it('should involve registerHelpers in build process', () => {
       // registerHelpers is imported, so it's part of the build
-      assert.ok(typeof registerHelpers === 'function', 'registerHelpers should be available');
+      assert.ok(
+        typeof registerHelpers === 'function',
+        'registerHelpers should be available'
+      );
     });
 
     it('should involve generatePartials in build process', () => {
       // generatePartials is imported, so it's part of the build
-      assert.ok(typeof generatePartials === 'function', 'generatePartials should be available');
+      assert.ok(
+        typeof generatePartials === 'function',
+        'generatePartials should be available'
+      );
     });
 
     it('should involve generatePosts in build process', () => {
       // generatePosts is imported, so it's part of the build
-      assert.ok(typeof generatePosts === 'function', 'generatePosts should be available');
+      assert.ok(
+        typeof generatePosts === 'function',
+        'generatePosts should be available'
+      );
     });
 
     it('should involve generateStyles in build process', () => {
       // generateStyles is imported, so it's part of the build
-      assert.ok(typeof generateStyles === 'function', 'generateStyles should be available');
+      assert.ok(
+        typeof generateStyles === 'function',
+        'generateStyles should be available'
+      );
     });
 
     it('should involve generatePages in build process', () => {
       // generatePages is imported, so it's part of the build
-      assert.ok(typeof generatePages === 'function', 'generatePages should be available');
+      assert.ok(
+        typeof generatePages === 'function',
+        'generatePages should be available'
+      );
     });
   });
 
@@ -154,7 +165,7 @@ describe('Build Entry Point', () => {
 
     it('should export both default and named exports', async () => {
       const buildModule = await import('../scripts/build/build.js');
-      
+
       assert.ok(buildModule.default, 'Should have default export');
       assert.ok(buildModule.build, 'Should have named export');
       assert.strictEqual(
@@ -204,7 +215,7 @@ describe('Build Entry Point', () => {
       // Run build twice
       await build();
       await build();
-      
+
       // Both should complete successfully
       assert.ok(true, 'Should handle repeated builds');
     });
@@ -212,7 +223,7 @@ describe('Build Entry Point', () => {
     it('should not mutate global state between builds', async () => {
       // First build
       await build();
-      
+
       // Second build should work the same way
       await assert.doesNotReject(
         async () => await build(),
@@ -226,7 +237,7 @@ describe('Build Entry Point', () => {
       const start = Date.now();
       await build();
       const duration = Date.now() - start;
-      
+
       // Build should complete in under 5 seconds for test project
       // This is a sanity check, not a strict performance test
       assert.ok(duration < 10000, 'Should complete in reasonable time');

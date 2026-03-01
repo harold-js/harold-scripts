@@ -122,7 +122,7 @@ describe('Generate Styles', () => {
   describe('file discovery', () => {
     it('should use glob to find SCSS and CSS files', async () => {
       fsSync.existsSync = () => true;
-      
+
       let globPattern = null;
       glob.sync = (pattern) => {
         globPattern = pattern;
@@ -140,7 +140,7 @@ describe('Generate Styles', () => {
 
     it('should search in src/styles directory', async () => {
       fsSync.existsSync = () => true;
-      
+
       let globPattern = null;
       glob.sync = (pattern) => {
         globPattern = pattern;
@@ -207,7 +207,7 @@ describe('Generate Styles', () => {
   describe('configuration', () => {
     it('should use config values for directory names', async () => {
       fsSync.existsSync = () => true;
-      
+
       let checkedPath = null;
       fsSync.existsSync = (dirPath) => {
         checkedPath = dirPath;
@@ -237,7 +237,7 @@ describe('Generate Styles', () => {
       // Note: Without mocking renderSync/postcss, files won't actually be written
       // But we can verify the directory structure would be correct
       // The function creates: outputDir = dirname(fileName).replace('src', 'build')
-      
+
       // For real tests, we'd need actual SCSS files or deeper mocking
       // This test verifies the logic is present
       assert.ok(true, 'Directory structure logic is present in code');
@@ -297,7 +297,7 @@ describe('Generate Styles', () => {
       // Should log error message for failed compilation
       assert.ok(
         logOutput.includes("Couldn't write the css file") ||
-        errorOutput.length > 0,
+          errorOutput.length > 0,
         'Should log errors for failed compilations'
       );
     });
@@ -315,15 +315,12 @@ describe('Generate Styles', () => {
 
       await generateStyles();
 
-      assert.ok(
-        existsCheckCalled,
-        'Should check if styles directory exists'
-      );
+      assert.ok(existsCheckCalled, 'Should check if styles directory exists');
     });
 
     it('should use glob.sync for file discovery', async () => {
       fsSync.existsSync = () => true;
-      
+
       let globSyncCalled = false;
       glob.sync = () => {
         globSyncCalled = true;

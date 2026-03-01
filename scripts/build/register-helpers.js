@@ -131,7 +131,7 @@ const registerHelpers = () => {
       if (posts && posts.length > 0) {
         const parsed = JSON.parse(posts);
         const sorted = sortPostsByDate(parsed);
-        const postsSortedAndFiltered = byTagName 
+        const postsSortedAndFiltered = byTagName
           ? filterPostsByTag(sorted, byTagName)
           : sorted;
 

@@ -48,7 +48,7 @@ describe('Generate Partials', () => {
       // Mock fs functions
       fs.existsSync = () => true;
       fs.readdirSync = () => ['header.hbs', 'footer.hbs', 'navigation.hbs'];
-      
+
       // Mock fs.readFileSync (used by to-vfile under the hood)
       fs.readFileSync = (filePath) => {
         if (filePath.includes('header.hbs')) {
@@ -137,7 +137,10 @@ describe('Generate Partials', () => {
 
       // Only valid partial should be registered
       const template = Handlebars.compile('{{> valid}}');
-      assert.ok(template({}).includes('Content'), 'Valid partial should be registered');
+      assert.ok(
+        template({}).includes('Content'),
+        'Valid partial should be registered'
+      );
 
       // Non-.hbs files should not be registered
       assert.ok(
@@ -203,7 +206,7 @@ describe('Generate Partials', () => {
       );
     });
 
-    it('should handle empty partials directory', async (t) => {
+    it('should handle empty partials directory', async () => {
       fs.existsSync = () => true;
       fs.readdirSync = () => [];
 
@@ -269,7 +272,10 @@ describe('Generate Partials', () => {
       });
 
       assert.ok(result.includes('Test Title'), 'Should render title');
-      assert.ok(result.includes('Test Description'), 'Should render description');
+      assert.ok(
+        result.includes('Test Description'),
+        'Should render description'
+      );
       assert.ok(result.includes('/test'), 'Should render link');
     });
 
@@ -366,4 +372,3 @@ describe('Generate Partials', () => {
     });
   });
 });
-

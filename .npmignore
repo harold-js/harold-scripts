@@ -1,4 +1,5 @@
 .editorconfig
 eslint.config.mjs
 .prettierrc
+.husky
 tests

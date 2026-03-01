@@ -22,7 +22,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
     it('should format date with default format (yyyy-mm-dd)', () => {
       const template = Handlebars.compile('{{formatDate date="2025-01-15"}}');
       const result = template({});
-      
+
       assert.strictEqual(result, '2025-01-15', 'Should format date correctly');
     });
 
@@ -31,7 +31,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
         '{{formatDate date="2025-01-15" format="mmmm dd, yyyy"}}'
       );
       const result = template({});
-      
+
       assert.strictEqual(
         result,
         'January 15, 2025',
@@ -44,7 +44,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
         '{{formatDate date="2025-12-25" format="mmm d, yy"}}'
       );
       const result = template({});
-      
+
       assert.strictEqual(
         result,
         'Dec 25, 25',
@@ -54,7 +54,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
 
     it('should handle invalid date by throwing error', () => {
       const template = Handlebars.compile('{{formatDate date="not-a-date"}}');
-      
+
       // formatDate throws on invalid dates (expected behavior)
       assert.throws(() => {
         template({});
@@ -70,7 +70,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
       const result = template({
         publicRelativeFileDir: 'build',
       });
-      
+
       assert.ok(
         result.includes('styles/main.css'),
         'Should include the asset path'
@@ -82,7 +82,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
     it('should return host directory name', () => {
       const template = Handlebars.compile('{{hostDirName}}');
       const result = template({});
-      
+
       // Should return a string (empty or with value depending on config)
       assert.strictEqual(
         typeof result,
@@ -100,7 +100,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
       const result = template({
         publicRelativeFileDir: 'build',
       });
-      
+
       assert.ok(result.includes('<img'), 'Should generate img tag');
       assert.ok(result.includes('alt="Test Image"'), 'Should include alt text');
       assert.ok(
@@ -120,7 +120,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
       const result = template({
         publicRelativeFileDir: 'build',
       });
-      
+
       assert.ok(result.includes('width="800"'), 'Should include width');
       assert.ok(result.includes('height="600"'), 'Should include height');
     });
@@ -130,7 +130,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
       const result = template({
         publicRelativeFileDir: 'build',
       });
-      
+
       // Should return empty string when src is missing
       assert.strictEqual(result, '', 'Should return empty string without src');
     });
@@ -142,7 +142,7 @@ describe('Harold Scripts - Handlebars Helpers', () => {
       const result = template({
         publicRelativeFileDir: 'build',
       });
-      
+
       assert.ok(
         result.includes('class="featured-image"'),
         'Should include custom class'

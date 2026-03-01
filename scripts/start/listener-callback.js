@@ -2,6 +2,7 @@ import { parse } from 'node:path';
 import path from 'node:path';
 import fs from 'node:fs';
 import fse from 'fs-extra';
+import chalk from 'chalk';
 import copyAssets from '../build/copy-assets.js';
 import copyJSONData from '../build/copy-json-data.js';
 import config from '../build/constants.js';
@@ -10,6 +11,7 @@ import build from '../build/build.js';
 
 // Operations for file changes listener
 const listenerCallback = async (event, filePath) => {
+  console.log(chalk.cyan('Building...'));
   await build();
   if (filePath.includes(`${config.srcDirName}/${config.assetsDirName}`)) {
     copyAssets();
@@ -18,7 +20,10 @@ const listenerCallback = async (event, filePath) => {
     copyJSONData();
 
     // Handle markdown file deletions in nested directories
-    if (event === 'unlink' && (filePath.endsWith('.md') || filePath.endsWith('.markdown'))) {
+    if (
+      event === 'unlink' &&
+      (filePath.endsWith('.md') || filePath.endsWith('.markdown'))
+    ) {
       const postsSrcDirPath = path.join(
         process.cwd(),
         config.srcDirName,
@@ -57,7 +62,7 @@ const listenerCallback = async (event, filePath) => {
             } else {
               break;
             }
-          } catch (err) {
+          } catch {
             break;
           }
         }
@@ -85,6 +90,7 @@ const listenerCallback = async (event, filePath) => {
     fse.removeSync(publicFilePath);
   }
   console.log(`${event}: ${filePath}`);
+  console.log(chalk.green('Ready.'));
 };
 
 export default listenerCallback;

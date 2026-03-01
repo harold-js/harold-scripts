@@ -48,8 +48,8 @@ export const filterPostsByTag = (posts, tagName) => {
   if (!tagName) {
     return posts;
   }
-  return posts.filter((post) => 
-    Array.isArray(post.tags) && post.tags.includes(tagName)
+  return posts.filter(
+    (post) => Array.isArray(post.tags) && post.tags.includes(tagName)
   );
 };
 
@@ -63,11 +63,11 @@ export const normalizeLineEndings = (content) => {
   if (!content) {
     return content;
   }
-  
+
   const str = Buffer.isBuffer(content)
     ? content.toString('utf8')
     : String(content);
-    
+
   return str.replace(/\r\n/g, '\n');
 };
 
@@ -84,7 +84,7 @@ export const hasRequiredFields = (obj, requiredFields) => {
   if (!Array.isArray(requiredFields)) {
     return false;
   }
-  
+
   const objectKeys = Object.keys(obj);
   return requiredFields.every((field) => objectKeys.includes(field));
 };
@@ -100,4 +100,3 @@ export const extractFrontMatter = (file) => {
   }
   return file.data.matter;
 };
-
