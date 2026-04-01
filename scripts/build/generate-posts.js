@@ -223,6 +223,15 @@ const generatePosts = async () => {
   fse.ensureDirSync(postsPublicDirPath);
   fse.emptyDirSync(postsPublicDirPath);
 
+  const postsRootEntries = fs.readdirSync(postsSrcDirPath);
+
+  if (postsRootEntries.length === 0) {
+    console.log(
+      chalk.yellow('Posts root directory is empty. Skipping posts generation.')
+    );
+    return;
+  }
+
   // Use glob for recursive file discovery
   // Use pattern with cwd option for better cross-platform compatibility
   const markdownFiles = glob
@@ -237,11 +246,6 @@ const generatePosts = async () => {
 
   // Skip if no markdown files found
   if (markdownFiles.length === 0) {
-    console.log(
-      chalk.yellow(
-        'No markdown files found in posts directory. Skipping posts generation.'
-      )
-    );
     return;
   }
 
